@@ -1,0 +1,17 @@
+{
+    "easyNavigator_version": 2,
+
+    "name": "EasyNavigator",
+    "description": "This extension Exploits Browsing Context for Efﬁcient Revisitation and Tab Switching",
+    "version": "1.0",
+
+    "permissions": [
+        "https://secure.flickr.com/",
+        "history",
+        "tabs"
+    ],
+    "browser_action": {
+        "default_icon": "icon.png",
+        "default_popup": "popup.html"
+    }
+}
