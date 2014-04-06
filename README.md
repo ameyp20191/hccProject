@@ -1,2 +1,2 @@
-hccProject
+EasyNavigator
 ==========
