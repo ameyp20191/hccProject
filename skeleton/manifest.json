@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
 
-    "name": "One-click Kittens",
-    "description": "This extension demonstrates a browser action with kittens.",
+    "name": "EasyNavigator",
+    "description": "This extension Exploits Browsing Context for Efﬁcient Revisitation and Tab Switching",
     "version": "1.0",
 
     "permissions": [
