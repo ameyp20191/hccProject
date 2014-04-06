@@ -2,29 +2,54 @@ var labelType, useGradients, nativeTextSupport, animate;
 
 
 (function() {
-  var ua = navigator.userAgent,
-      iStuff = ua.match(/iPhone/i) || ua.match(/iPad/i),
-      typeOfCanvas = typeof HTMLCanvasElement,
-      nativeCanvasSupport = (typeOfCanvas == 'object' || typeOfCanvas == 'function'),
-      textSupport = nativeCanvasSupport 
-        && (typeof document.createElement('canvas').getContext('2d').fillText == 'function');
-  //I'm setting this based on the fact that ExCanvas provides text support for IE
-  //and that as of today iPhone/iPad current text support is lame
-  labelType = (!nativeCanvasSupport || (textSupport && !iStuff))? 'Native' : 'HTML';
-  nativeTextSupport = labelType == 'Native';
-  useGradients = nativeCanvasSupport;
-  animate = !(iStuff || !nativeCanvasSupport);
+    var ua = navigator.userAgent,
+        iStuff = ua.match(/iPhone/i) || ua.match(/iPad/i),
+        typeOfCanvas = typeof HTMLCanvasElement,
+        nativeCanvasSupport = (typeOfCanvas == 'object' || typeOfCanvas == 'function'),
+        textSupport = nativeCanvasSupport 
+            && (typeof document.createElement('canvas').getContext('2d').fillText == 'function');
+    //I'm setting this based on the fact that ExCanvas provides text support for IE
+    //and that as of today iPhone/iPad current text support is lame
+    labelType = (!nativeCanvasSupport || (textSupport && !iStuff))? 'Native' : 'HTML';
+    nativeTextSupport = labelType == 'Native';
+    useGradients = nativeCanvasSupport;
+    animate = !(iStuff || !nativeCanvasSupport);
 })();
 
 var Log = {
-  elem: false,
-  write: function(text){
-    if (!this.elem) 
-      this.elem = document.getElementById('log');
-    this.elem.innerHTML = text;
-    this.elem.style.left = (500 - this.elem.offsetWidth / 2) + 'px';
-  }
+    elem: false,
+    write: function(text){
+        if (!this.elem) 
+            this.elem = document.getElementById('log');
+        this.elem.innerHTML = text;
+        this.elem.style.left = (500 - this.elem.offsetWidth / 2) + 'px';
+    }
 };
+
+
+// Convert an array of tab objects to a JSON representation compatible
+// with the Hypertree.  TODO: Add a linkBy argument to control how
+// edges between nodes are determined.
+function tabsToJson(tabs) {
+    var rootNode = {"id": "window-node",
+                    "name": "Current window",
+                    "data": {},
+                    "children": []
+                   };
+    var nodesArray = [];
+    for (var i=0; i<tabs.length; i++) {
+        var node = {"data": {}};
+        var tab = tabs[i];
+        node.id = tab.id.toString();
+        node.name = tab.title;
+        node.relation = "child of window";
+        rootNode.children.push(node);
+        console.log('Pushed tab: ' + node.name);
+    }
+    console.log('nodes json = ');
+    console.log(rootNode);
+    return rootNode;
+}
 
 
 function init(){
@@ -42,7 +67,7 @@ function init(){
     
     var infovis = document.getElementById('infovis');
     var w = infovis.offsetWidth - 50, h = infovis.offsetHeight - 50;
-    
+
     //init Hypertree
     var ht = new $jit.Hypertree({
         //id of the visualization container
@@ -114,24 +139,40 @@ function init(){
                 var child = adj.nodeTo;
                 if (child.data) {
                     var rel = (child.data.band == node.name) ? child.data.relation : node.data.relation;
-                    html += "<a href='#' class='node-link' " + 
-                        "node-id='" + child.id + "'>" + child.name + " " + 
+                    // html += "<a href='#' class='node-link' " + 
+                    //     "node-id='" + child.id + "'>" + child.name + " " + 
+                    //     "<div class=\"relation\">(relation: " + rel + ")</div></a>";
+
+                    html += "<a href='#' class='tab-link' " + 
+                        "tab-id='" + child.id + "'>" + child.name + " " + 
                         "<div class=\"relation\">(relation: " + rel + ")</div></a>";
+
                 }
             });
             html += "</ul>";
             $jit.id('inner-details').innerHTML = html;
         }
     });
-    //load JSON data.
-    ht.loadJSON(json);
-    //compute positions and plot.
-    ht.refresh();
-    //end
-    ht.controller.onComplete();
+
+    chrome.tabs.query({}, function(tabs) {
+        var json = tabsToJson(tabs);
+        //load JSON data.
+        ht.loadJSON(json);
+        //compute positions and plot.
+        ht.refresh();
+        //end
+        ht.controller.onComplete();
+    });
 }
 
 $(document).ready(function() {
+    $('body').on('click', 'a.tab-link', function() {
+        console.log('tab handler called!');
+        var tabId = parseInt($(this).attr('tab-id'));
+        chrome.tabs.update(tabId, {active: true}, function() {});
+        return false;
+    });
+
     $('body').on('click', 'a.node-link', function() {
         console.log('handler called!');
         var nodeId = $(this).attr('node-id');

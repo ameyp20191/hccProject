@@ -1,4 +1,4 @@
-var json = {
+var musicJson = {
     "id": "347_0",
     "name": "Nine Inch Nails",
     "children": [{
