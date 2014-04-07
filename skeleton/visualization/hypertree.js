@@ -35,7 +35,15 @@ function cloneObject(obj) {
 function tabToNode(tab) {
     var node = {"data": {}, "children": []};
     node.id = tab.id.toString();
-    node.name = tab.title;
+    if (tab.title.length > 21) {
+        node.name = tab.title.substring(0, 18) + '..';
+    }
+    else {
+        node.name = tab.title;
+    }
+
+    node.data.title = tab.title;
+    node.data.url = tab.url;
     return node;
 }
 
@@ -116,6 +124,22 @@ function init(){
     //var w = 1280, h = 1024;
     //init Hypertree
     var ht = new $jit.Hypertree({
+        duration: 1000,
+        Navigation: {
+            enable: true,
+            panning: true,
+            zooming: true
+        },
+        Tips: {
+            enable: true,
+            type: 'Native',
+            offsetX: 10,
+            offsetY: 10,
+            onShow: function(tip, node) {
+                console.log(tip);
+                tip.innerHTML = '<b>' + node.data.title + '</b> <br/>' + node.data.url;
+            }
+        },
         //id of the visualization container
         injectInto: 'infovis',
         //canvas width and height
