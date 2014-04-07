@@ -4,7 +4,10 @@
     "name": "EasyNavigator",
     "description": "This extension Exploits Browsing Context for Efﬁcient Revisitation and Tab Switching",
     "version": "1.0",
-
+    "background": {
+        "scripts": ["backgroundPage.js"],
+        "persistent": true
+    },
     "permissions": [
         "https://secure.flickr.com/",
         "history",

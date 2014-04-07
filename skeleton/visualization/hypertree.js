@@ -27,27 +27,73 @@ var Log = {
 };
 
 
-// Convert an array of tab objects to a JSON representation compatible
-// with the Hypertree.  TODO: Add a linkBy argument to control how
-// edges between nodes are determined.
-function tabsToJson(tabs) {
+function cloneObject(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+
+
+function tabToNode(tab) {
+    var node = {"data": {}, "children": []};
+    node.id = tab.id.toString();
+    node.name = tab.title;
+    return node;
+}
+
+
+// Get the complete subtree for a tab and add it to the given tree.
+function attachTabAndAncestors(tab, tabsById, tree, treeById) {
+    var tabOpenerInfo = chrome.extension.getBackgroundPage().tabOpenerInfo;
+
+    var openerTabId = tabOpenerInfo[tab.id];
+    var openerTab = tabsById[openerTabId];
+
+    var parentNode = null;      // Parent of the current tab in the tree
+    // If opener tab exists, it is the parent
+    if (openerTabId != undefined && openerTab != undefined) {
+        var openerTabIdString = openerTabId.toString();
+
+        // If opener tab has not been added, add its subtree
+        if (!(openerTabIdString in treeById)) {
+            parentNode = tabToSubtree(openerTab, tabsById, tree, treeById);
+        }
+        // Otherwise, get the opener tab node
+        else {
+            parentNode = treeById[openerTabIdString];
+        }
+    }
+    // No opener tab -- root is the parent
+    else {
+        parentNode = tree;
+    }
+
+    var node = tabToNode(tab);
+    node.relation = "Child tab";
+    parentNode.children.push(node);
+    treeById[node.id] = node;
+
+    return node;
+}
+
+
+function tabsToTree(tabs) {
+    var tabsById = {};
+    for (var i=0; i<tabs.length; i++) {
+        tabsById[tabs[i].id] = tabs[i];
+    }
+
     var rootNode = {"id": "window-node",
                     "name": "Current window",
                     "data": {},
                     "children": []
                    };
-    var nodesArray = [];
-    for (var i=0; i<tabs.length; i++) {
-        var node = {"data": {}};
-        var tab = tabs[i];
-        node.id = tab.id.toString();
-        node.name = tab.title;
-        node.relation = "child of window";
-        rootNode.children.push(node);
-        console.log('Pushed tab: ' + node.name);
+    var treeById = {"window-node": rootNode};
+    
+    for (i=0; i<tabs.length; i++) {
+        if (tabs[i].id in treeById) {
+            continue;
+        }
+        attachTabAndAncestors(tabs[i], tabsById, rootNode, treeById);
     }
-    console.log('nodes json = ');
-    console.log(rootNode);
     return rootNode;
 }
 
@@ -139,10 +185,6 @@ function init(){
                 var child = adj.nodeTo;
                 if (child.data) {
                     var rel = (child.data.band == node.name) ? child.data.relation : node.data.relation;
-                    // html += "<a href='#' class='node-link' " + 
-                    //     "node-id='" + child.id + "'>" + child.name + " " + 
-                    //     "<div class=\"relation\">(relation: " + rel + ")</div></a>";
-
                     html += "<a href='#' class='tab-link' " + 
                         "tab-id='" + child.id + "'>" + child.name + " " + 
                         "<div class=\"relation\">(relation: " + rel + ")</div></a>";
@@ -155,7 +197,8 @@ function init(){
     });
 
     chrome.tabs.query({}, function(tabs) {
-        var json = tabsToJson(tabs);
+        var json = tabsToTree(tabs);
+        console.log(json);
         //load JSON data.
         ht.loadJSON(json);
         //compute positions and plot.
@@ -167,14 +210,12 @@ function init(){
 
 $(document).ready(function() {
     $('body').on('click', 'a.tab-link', function() {
-        console.log('tab handler called!');
         var tabId = parseInt($(this).attr('tab-id'));
         chrome.tabs.update(tabId, {active: true}, function() {});
         return false;
     });
 
     $('body').on('click', 'a.node-link', function() {
-        console.log('handler called!');
         var nodeId = $(this).attr('node-id');
         $('#' + nodeId).click();
         return false;
