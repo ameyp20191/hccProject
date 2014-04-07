@@ -40,7 +40,7 @@ function tabToNode(tab) {
 }
 
 
-// Get the complete subtree for a tab and add it to the given tree.
+// Recursively attach the current tab and its ancestors to the tree.
 function attachTabAndAncestors(tab, tabsById, tree, treeById) {
     var tabOpenerInfo = chrome.extension.getBackgroundPage().tabOpenerInfo;
 
@@ -52,9 +52,9 @@ function attachTabAndAncestors(tab, tabsById, tree, treeById) {
     if (openerTabId != undefined && openerTab != undefined) {
         var openerTabIdString = openerTabId.toString();
 
-        // If opener tab has not been added, add its subtree
+        // If opener tab has not been added, add it and its ancestors
         if (!(openerTabIdString in treeById)) {
-            parentNode = tabToSubtree(openerTab, tabsById, tree, treeById);
+            parentNode = attachTabAndAncestors(openerTab, tabsById, tree, treeById);
         }
         // Otherwise, get the opener tab node
         else {
@@ -113,7 +113,7 @@ function init(){
     
     var infovis = document.getElementById('infovis');
     var w = infovis.offsetWidth - 50, h = infovis.offsetHeight - 50;
-
+    //var w = 1280, h = 1024;
     //init Hypertree
     var ht = new $jit.Hypertree({
         //id of the visualization container
