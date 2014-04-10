@@ -26,11 +26,6 @@ var Log = {
 };
 
 
-function cloneObject(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}
-
-
 function tabToNode(tab) {
   var node = {"data": {}, "children": []};
   node.id = tab.id.toString();
