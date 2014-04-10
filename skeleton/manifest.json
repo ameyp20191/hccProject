@@ -9,7 +9,7 @@
         "persistent": true
     },
     "permissions": [
-        "https://secure.flickr.com/",
+        "<all_urls>",
         "history",
         "tabs"
     ],

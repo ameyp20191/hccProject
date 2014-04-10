@@ -26,7 +26,8 @@ $(document).ready(function() {
             for (var i=0; i<results.length && i<maxUrls; i++) {
                 var r = results[i];
                 $('<a/>', {href: r.url, text: r.url}).appendTo(content);
-                $('<div/>', {text: 'Count: ' + r.visitCount}).appendTo(content);
+                $('<div/>', {'class': 'url-info',
+                             text: 'Count: ' + r.visitCount}).appendTo(content);
             }       
         });
     }
@@ -42,7 +43,8 @@ $(document).ready(function() {
             for (var i=0; i<results.length && i<maxUrls; i++) {
                 var r = results[i];
                 $('<a/>', {href: r.url, text: r.url}).appendTo(content);
-                $('<div/>', {text: 'Last visit: ' + moment(r.lastVisitTime).format('llll')}).appendTo(content);
+                $('<div/>', {'class': 'url-info', text: 'Last visit: ' + 
+                             moment(r.lastVisitTime).format('llll')}).appendTo(content);
             }       
         });
     };
@@ -52,12 +54,18 @@ $(document).ready(function() {
         function (tabs) {
             var tab = tabs[0];
 
-            addNodeAndTextToBody('div', tab.url);
-            addNodeAndTextToBody('div', tab.title);
+            var tabTitleDiv = $(
+                '<div/>', {'class': 'current-tab-info title', 
+                           text: tab.title}).appendTo("body");
+            var tabUrlDiv = $(
+                '<div/>', {'class': 'current-tab-info url', 
+                           text: tab.url}).appendTo("body");
 
             var tabUrl = (new URI(tab.url)).normalize();
-            var tabUrlOneLevelUp = tabUrl.clone().segment(-1, '');
+            var tabDomain = tabUrl.domain();
+            var tabUrlOneLeavelUp = tabUrl.clone().segment(-1, '');
             var oneWeekAgo = moment().subtract('weeks', 1).valueOf();
+            var oneMonthAgo = moment().subtract('months', 1).valueOf();
             var maxUrls = 5;
 
             var visualizeLinkDiv = $(
@@ -65,13 +73,15 @@ $(document).ready(function() {
                          href: 'visualization/hypertree.html',
                          text: 'Visualization'}).appendTo('body');
             
-            var mostVisitedDiv = $('<div/>', {id: 'most-visited'}).appendTo('body');
+            var mostVisitedDiv = $(
+                '<div/>', {'class': 'links-div', id: 'most-visited'}).appendTo('body');
             console.log(mostVisitedDiv);
 
-            var mostRecentDiv = $('<div/>', {id: 'most-recent'}).appendTo('body');
+            var mostRecentDiv = $(
+                '<div/>', {'class': 'links-div', id: 'most-recent'}).appendTo('body');
             console.log(mostRecentDiv);
 
-            showMostVisitedUrls(tabUrlOneLevelUp.valueOf(), oneWeekAgo, maxUrls, mostVisitedDiv);
-            showMostRecentUrls(tabUrlOneLevelUp.valueOf(), maxUrls, mostRecentDiv);
+            showMostVisitedUrls(tabDomain.valueOf(), oneMonthAgo, maxUrls, mostVisitedDiv);
+            showMostRecentUrls(tabDomain.valueOf(), maxUrls, mostRecentDiv);
         });
 });

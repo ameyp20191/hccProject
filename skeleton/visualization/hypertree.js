@@ -197,8 +197,9 @@ function init(){
         },
         
         onComplete: function(){
-            Log.write("done");
-            
+            //Log.write("done");
+            Log.write(" ");
+
             //Build the right column relations list.
             //This is done by collecting the information (stored in the data property) 
             //for all the nodes adjacent to the centered node.
@@ -209,9 +210,11 @@ function init(){
                 var child = adj.nodeTo;
                 if (child.data) {
                     var rel = (child.data.band == node.name) ? child.data.relation : node.data.relation;
-                    html += "<a href='#' class='tab-link' " + 
-                        "tab-id='" + child.id + "'>" + child.name + " " + 
-                        "<div class=\"relation\">(relation: " + rel + ")</div></a>";
+                    // html += "<a href='#' class='tab-link' " + 
+                    //     "tab-id='" + child.id + "'>" + child.name + " " + 
+                    //     "<div class=\"relation\">(relation: " + rel + ")</div></a>";
+                    html += "<div><a href='#' class='tab-link' " + 
+                        "tab-id='" + child.id + "'>" + child.data.title + "</a></div>";
 
                 }
             });
