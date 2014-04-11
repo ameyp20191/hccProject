@@ -77,12 +77,17 @@ function attachTabAndAncestors(tab, tabsById, tree, treeById) {
 }
 
 
-function tabsToTree(tabs) {
+function getTabsById(tabs) {
   var tabsById = {};
   for (var i=0; i<tabs.length; i++) {
     tabsById[tabs[i].id] = tabs[i];
   }
+  return tabsById;
+}
 
+
+function tabsToTree(tabs) {
+  var tabsById = getTabsById(tabs);
   var rootNode = {"id": "window-node",
                   "name": "Current window",
                   "data": {},
@@ -90,13 +95,37 @@ function tabsToTree(tabs) {
                  };
   var treeById = {"window-node": rootNode};
   
-  for (i=0; i<tabs.length; i++) {
+  for (var i=0; i<tabs.length; i++) {
     if (tabs[i].id in treeById) {
       continue;
     }
     attachTabAndAncestors(tabs[i], tabsById, rootNode, treeById);
   }
   return rootNode;
+}
+
+function normalizeUrl(url) {
+  return url.normalize();
+}
+
+// Is node A an ancestor of node B?
+function isAncestorOf(nodeA, nodeB) {
+  var urlA = new URI(nodeA.data.url);
+  var urlB = new URI(nodeB.data.url);
+
+  normalizeUrl(urlA);
+  normalizeUrl(urlB);
+}
+
+
+function tabsToTreeByUrl(tabs) {
+  var tabsById = getTabsById(tabs);
+  var tree = {};
+  var rootNode = {"id": "root-node",
+                  "name": "Root",
+                  "data": {url: "/"},
+                  "children": []
+                 };
 }
 
 
