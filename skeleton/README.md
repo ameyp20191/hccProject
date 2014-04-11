@@ -1,0 +1,4 @@
+easynavigator
+=============
+
+EasyNavigator Chrome extension
