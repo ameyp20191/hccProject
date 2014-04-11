@@ -45,7 +45,6 @@ function showMostRecentUrls(searchText, maxUrls, node) {
   });
 };
 
-
 $(document).ready(function() {
   // Clicking a link opens it in a new tab
   $('body').on('click', 'a', function() {
@@ -70,10 +69,12 @@ $(document).ready(function() {
                                      text: tab.title}).appendTo("body");
       var tabUrlDiv = $('<div/>', {'class': 'current-tab-info url', 
                                    text: tab.url}).appendTo("body");
+      var markLinkDiv = $('<div/>').append($('<input/>', {id: 'mark', type: 'submit', value: 'Mark'})).appendTo('body');                                      
+                                   
       var visualizeLinkDiv = $('<a/>', {id: 'visualize-link', 
                                         href: 'visualization/hypertree.html',
-                                        text: 'Visualization'}).appendTo('body');
-
+                                        text: 'Visualization'}).appendTo('body');                          
+                                        
       var mostVisitedDiv = $('<div/>', {'class': 'links-div', 
                                         id: 'most-visited'}).appendTo('body');
       var mostRecentDiv = $('<div/>', {'class': 'links-div', 
@@ -81,5 +82,24 @@ $(document).ready(function() {
 
       showMostVisitedUrls(tabDomain.valueOf(), oneMonthAgo, maxUrls, mostVisitedDiv);
       showMostRecentUrls(tabDomain.valueOf(), maxUrls, mostRecentDiv);
-    });
+
+      // click the mark button
+      $('#mark').click(function() {
+        markTab();
+      })
+    });   
+  
 });
+
+
+/**
+ * Send message with {action: markTab, tabId}
+ */
+function markTab()
+{
+  chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
+    console.log(tabs[0].id);
+    chrome.runtime.sendMessage({action: "markTab", tabId: tabs[0].id});
+  });
+}
+
