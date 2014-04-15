@@ -42,30 +42,8 @@ function tabToNode(tab) {
 }
 
 
-function displayTree(ht, groupBy) {
-  chrome.tabs.query({}, function(tabs) {
-    var json;
-    if (groupBy == "sequence") {
-      json = tabsToTreeBySequence(tabs);
-    }
-    else if (groupBy === "url") {
-      json = tabsToTreeByUrl(tabs);
-    }
-    else { 
-      json = tabsToTreeBySequence(tabs);
-    }
-    
-    console.log(json);
-    //load JSON data.
-    ht.loadJSON(json);
-    //compute positions and plot.
-    ht.refresh();
-    //end
-    ht.controller.onComplete();
-  });
-}
 
-function init(){
+function init(groupBy){
   $jit.Hypertree.Plot.NodeTypes.implement({
     'image': {
       'render': function(node, canvas) {
@@ -79,6 +57,7 @@ function init(){
   });
   
   var infovis = document.getElementById('infovis');
+  infovis.innerHTML = '';
   var w = infovis.offsetWidth - 50, h = infovis.offsetHeight - 50;
   //var w = 1280, h = 1024;
   //init Hypertree
@@ -180,7 +159,32 @@ function init(){
     }
   });
 
-  displayTree(ht, 'url');
+  function displayTree(groupBy) {
+    chrome.tabs.query({}, function(tabs) {
+      console.log('groupBy = ');
+      console.log(groupBy);
+      var json;
+      if (groupBy === "sequence") {
+        json = tabsToTreeBySequence(tabs);
+      }
+      else if (groupBy === "url") {
+        json = tabsToTreeByUrl(tabs);
+      }
+      else { 
+        json = tabsToTreeBySequence(tabs);
+      }
+      
+      console.log(json);
+      //load JSON data.
+      ht.loadJSON(json);
+      //compute positions and plot.
+      ht.refresh();
+      //end
+      ht.controller.onComplete();
+    });
+  }
+
+  displayTree(groupBy);
 }
 
 
@@ -213,7 +217,6 @@ function addHoverToPreviewActions() {
   }
 
   var hoverTimeout;
-
   $('body').on('mouseenter', 'div.node', function() {
     var tabId = getTabId(this);
     var previewWaitTime = 1000;
@@ -231,6 +234,12 @@ function addHoverToPreviewActions() {
   });
 }
 
+function setupTree(groupBy) {
+  init(groupBy);
+}
+
+var groupBy = 'sequence';
+
 $(document).ready(function() {
   $('body').on('click', 'a.tab-link', function() {
     var tabId = getTabId(this);
@@ -244,7 +253,13 @@ $(document).ready(function() {
     return false;
   });
 
-  addHoverToPreviewActions();
+  $('body').on('change', 'input[type=radio]', function() {
+    console.log('radio selected');
+    groupBy = $(this).val();
+    setupTree(groupBy);
+    return false;
+  });
 
-  init();
+  addHoverToPreviewActions();
+  setupTree(groupBy);
 });
