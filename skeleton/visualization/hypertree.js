@@ -5,7 +5,7 @@ var labelType, useGradients, nativeTextSupport, animate;
       iStuff = ua.match(/iPhone/i) || ua.match(/iPad/i),
       typeOfCanvas = typeof HTMLCanvasElement,
       nativeCanvasSupport = (typeOfCanvas == 'object' || typeOfCanvas == 'function'),
-      textSupport = nativeCanvasSupport 
+      textSupport = nativeCanvasSupport
         && (typeof document.createElement('canvas').getContext('2d').fillText == 'function');
   //I'm setting this based on the fact that ExCanvas provides text support for IE
   //and that as of today iPhone/iPad current text support is lame
@@ -19,7 +19,7 @@ var labelType, useGradients, nativeTextSupport, animate;
 var Log = {
   elem: false,
   write: function(text){
-    if (!this.elem) 
+    if (!this.elem)
       this.elem = document.getElementById('log');
     this.elem.innerHTML = text;
     this.elem.style.left = (500 - this.elem.offsetWidth / 2) + 'px';
@@ -55,7 +55,7 @@ function init(groupBy){
       }
     }
   });
-  
+
   var infovis = document.getElementById('infovis');
   infovis.innerHTML = '';
   var w = infovis.offsetWidth - 50, h = infovis.offsetHeight - 50;
@@ -131,13 +131,13 @@ function init(groupBy){
       var w = domElement.offsetWidth;
       style.left = (left - w / 2) + 'px';
     },
-    
+
     onComplete: function(){
       //Log.write("done");
       Log.write(" ");
 
       //Build the right column relations list.
-      //This is done by collecting the information (stored in the data property) 
+      //This is done by collecting the information (stored in the data property)
       //for all the nodes adjacent to the centered node.
       var node = ht.graph.getClosestNodeToOrigin("current");
       var html = "<h4>" + node.name + "</h4><b>Connections:</b>";
@@ -146,12 +146,8 @@ function init(groupBy){
         var child = adj.nodeTo;
         if (child.data) {
           var rel = (child.data.band == node.name) ? child.data.relation : node.data.relation;
-          // html += "<a href='#' class='tab-link' " + 
-          //     "tab-id='" + child.id + "'>" + child.name + " " + 
-          //     "<div class=\"relation\">(relation: " + rel + ")</div></a>";
-          html += "<div><a href='#' class='tab-link' " + 
+          html += "<div><a href='javascript:void(0)' class='tab-link' " +
             "tab-id='" + child.id + "'>" + child.data.title + "</a></div>";
-
         }
       });
       html += "</ul>";
@@ -170,10 +166,10 @@ function init(groupBy){
       else if (groupBy === "url") {
         json = tabsToTreeByUrl({tabs: tabs, useFakeNodes: true});
       }
-      else { 
+      else {
         json = tabsToTreeBySequence(tabs);
       }
-      
+
       console.log(json);
       //load JSON data.
       ht.loadJSON(json);
