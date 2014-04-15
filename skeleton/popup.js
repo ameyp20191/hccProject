@@ -68,8 +68,36 @@ $(document).ready(function() {
       var tabTitleDiv = $('<div/>', {'class': 'current-tab-info title', 
                                      text: tab.title}).appendTo("body");
       var tabUrlDiv = $('<div/>', {'class': 'current-tab-info url', 
-                                   text: tab.url}).appendTo("body");
-      var markLinkDiv = $('<div/>').append($('<input/>', {id: 'mark', type: 'submit', value: 'Mark'})).appendTo('body');                                      
+                                   text: tab.url}).appendTo("body");                                  
+      
+      // mark tabs
+      chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
+        var background = chrome.extension.getBackgroundPage();                                   
+        
+        var markLinkDiv = $('<div/>').append($('<input/>', {id: 'mark', type: 'submit', value: 'Mark'})).insertAfter(tabUrlDiv);
+        markLinkDiv.click(function() {
+          markTab();
+          unmarkLinkDiv.show();
+          markLinkDiv.hide();
+        });
+        
+        var unmarkLinkDiv = $('<div/>').append($('<input/>', {id: 'unmark', type: 'submit', value: 'Unmark'})).insertAfter(tabUrlDiv);
+        unmarkLinkDiv.click(function() {
+          unmarkTab();
+          markLinkDiv.show();
+          unmarkLinkDiv.hide();            
+        });
+        
+        if (background.tabsMarked.indexOf(tabs[0].id) == -1) {
+          markLinkDiv.show();
+          unmarkLinkDiv.hide();
+        }
+        else {
+          unmarkLinkDiv.show();
+          markLinkDiv.hide();
+        }    
+        
+      });
                                    
       var visualizeLinkDiv = $('<a/>', {id: 'visualize-link', 
                                         href: 'visualization/hypertree.html',
@@ -83,10 +111,6 @@ $(document).ready(function() {
       showMostVisitedUrls(tabDomain.valueOf(), oneMonthAgo, maxUrls, mostVisitedDiv);
       showMostRecentUrls(tabDomain.valueOf(), maxUrls, mostRecentDiv);
 
-      // click the mark button
-      $('#mark').click(function() {
-        markTab();
-      })
     });   
   
 });
@@ -103,3 +127,13 @@ function markTab()
   });
 }
 
+/**
+ * Send message with {action: unmarkTab, tabId}
+ */
+function unmarkTab()
+{
+  chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
+    console.log(tabs[0].id);
+    chrome.runtime.sendMessage({action: "unmarkTab", tabId: tabs[0].id});
+  });  
+}
