@@ -42,92 +42,28 @@ function tabToNode(tab) {
 }
 
 
-// Recursively attach the current tab and its ancestors to the tree.
-function attachTabAndAncestors(tab, tabsById, tree, treeById) {
-  var tabOpenerInfo = chrome.extension.getBackgroundPage().tabOpenerInfo;
-
-  var openerTabId = tabOpenerInfo[tab.id];
-  var openerTab = tabsById[openerTabId];
-
-  var parentNode = null;      // Parent of the current tab in the tree
-  // If opener tab exists, it is the parent
-  if (openerTabId != undefined && openerTab != undefined) {
-    var openerTabIdString = openerTabId.toString();
-
-    // If opener tab has not been added, add it and its ancestors
-    if (!(openerTabIdString in treeById)) {
-      parentNode = attachTabAndAncestors(openerTab, tabsById, tree, treeById);
+function displayTree(ht, groupBy) {
+  chrome.tabs.query({}, function(tabs) {
+    var json;
+    if (groupBy == "sequence") {
+      json = tabsToTreeBySequence(tabs);
     }
-    // Otherwise, get the opener tab node
-    else {
-      parentNode = treeById[openerTabIdString];
+    else if (groupBy === "url") {
+      json = tabsToTreeByUrl(tabs);
     }
-  }
-  // No opener tab -- root is the parent
-  else {
-    parentNode = tree;
-  }
-
-  var node = tabToNode(tab);
-  node.relation = "Child tab";
-  parentNode.children.push(node);
-  treeById[node.id] = node;
-
-  return node;
-}
-
-
-function getTabsById(tabs) {
-  var tabsById = {};
-  for (var i=0; i<tabs.length; i++) {
-    tabsById[tabs[i].id] = tabs[i];
-  }
-  return tabsById;
-}
-
-
-function tabsToTree(tabs) {
-  var tabsById = getTabsById(tabs);
-  var rootNode = {"id": "window-node",
-                  "name": "Current window",
-                  "data": {},
-                  "children": []
-                 };
-  var treeById = {"window-node": rootNode};
-  
-  for (var i=0; i<tabs.length; i++) {
-    if (tabs[i].id in treeById) {
-      continue;
+    else { 
+      json = tabsToTreeBySequence(tabs);
     }
-    attachTabAndAncestors(tabs[i], tabsById, rootNode, treeById);
-  }
-  return rootNode;
+    
+    console.log(json);
+    //load JSON data.
+    ht.loadJSON(json);
+    //compute positions and plot.
+    ht.refresh();
+    //end
+    ht.controller.onComplete();
+  });
 }
-
-function normalizeUrl(url) {
-  return url.normalize();
-}
-
-// Is node A an ancestor of node B?
-function isAncestorOf(nodeA, nodeB) {
-  var urlA = new URI(nodeA.data.url);
-  var urlB = new URI(nodeB.data.url);
-
-  normalizeUrl(urlA);
-  normalizeUrl(urlB);
-}
-
-
-function tabsToTreeByUrl(tabs) {
-  var tabsById = getTabsById(tabs);
-  var tree = {};
-  var rootNode = {"id": "root-node",
-                  "name": "Root",
-                  "data": {url: "/"},
-                  "children": []
-                 };
-}
-
 
 function init(){
   $jit.Hypertree.Plot.NodeTypes.implement({
@@ -244,16 +180,7 @@ function init(){
     }
   });
 
-  chrome.tabs.query({}, function(tabs) {
-    var json = tabsToTree(tabs);
-    console.log(json);
-    //load JSON data.
-    ht.loadJSON(json);
-    //compute positions and plot.
-    ht.refresh();
-    //end
-    ht.controller.onComplete();
-  });
+  displayTree(ht, 'url');
 }
 
 
