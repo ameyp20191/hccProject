@@ -15,6 +15,7 @@ var labelType, useGradients, nativeTextSupport, animate;
   animate = !(iStuff || !nativeCanvasSupport);
 })();
 
+
 var Log = {
   elem: false,
   write: function(text){
@@ -40,7 +41,6 @@ function tabToNode(tab) {
   node.data.url = tab.url;
   return node;
 }
-
 
 
 function init(groupBy){
@@ -168,7 +168,7 @@ function init(groupBy){
         json = tabsToTreeBySequence(tabs);
       }
       else if (groupBy === "url") {
-        json = tabsToTreeByUrl(tabs);
+        json = tabsToTreeByUrl({tabs: tabs, useFakeNodes: true});
       }
       else { 
         json = tabsToTreeBySequence(tabs);
@@ -238,7 +238,7 @@ function setupTree(groupBy) {
   init(groupBy);
 }
 
-var groupBy = 'sequence';
+var groupBy;
 
 $(document).ready(function() {
   $('body').on('click', 'a.tab-link', function() {
@@ -260,6 +260,9 @@ $(document).ready(function() {
     return false;
   });
 
+  // Set default group by criterion.
+  groupBy = 'url';
+  $('input[name=group-by][type=radio]').val([groupBy]);
   addHoverToPreviewActions();
   setupTree(groupBy);
 });
