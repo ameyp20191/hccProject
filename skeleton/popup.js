@@ -3,15 +3,17 @@ function showMarkAction(node) {
   chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
     var background = chrome.extension.getBackgroundPage();
 
-    var markLinkDiv = $('<div/>').append($('<input/>', {id: 'mark', type: 'submit', value: 'Mark'})).insertAfter(node);
-    markLinkDiv.click(function() {
+    var markLink = $('<input/>', {id: 'mark', type: 'button', value: 'Mark'});
+    var markLinkDiv = $('<div/>').insertAfter(node).append(markLink);
+    markLink.click(function() {
       markTab();
       unmarkLinkDiv.show();
       markLinkDiv.hide();
     });
 
-    var unmarkLinkDiv = $('<div/>').append($('<input/>', {id: 'unmark', type: 'submit', value: 'Unmark'})).insertAfter(node);
-    unmarkLinkDiv.click(function() {
+    var unmarkLink = $('<input/>', {id: 'unmark', type: 'button', value: 'Unmark'});
+    var unmarkLinkDiv = $('<div/>').insertAfter(node).append(unmarkLink);
+    unmarkLink.click(function() {
       unmarkTab();
       markLinkDiv.show();
       unmarkLinkDiv.hide();
