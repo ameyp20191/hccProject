@@ -187,6 +187,8 @@ function init(groupBy){
       });
       html += "</ul>";
       $jit.id('inner-details').innerHTML = html;
+      
+      addClickToAnnotation();
     }
   });
 
@@ -215,6 +217,46 @@ function init(groupBy){
   displayTree(groupBy);
 }
 
+
+/**
+ * Add markings to annotate tabs
+ */
+function addClickToAnnotation() {  
+  
+  $('div.node').each(function() {
+    if ($(this).has('a').length == 0) {
+      var mark = $('<a/>', {class: 'mark',
+                        text: '★ '});
+      var unmark = $('<a/>', {class: 'unmark',
+                              text: '★ '});         
+      var tabID = $(this).attr('id');
+                              
+      mark.click(function() {
+        mark.hide();
+        unmark.show();        
+        chrome.runtime.sendMessage({action: "unmarkTab", tabId: tabID});
+      });
+      
+      unmark.click(function() {
+        unmark.hide();
+        mark.show();        
+        chrome.runtime.sendMessage({action: "markTab", tabId: tabID});        
+      })
+        
+      if ($(this).text().indexOf('★ ') == 0) {      
+        $(this).html($(this).text().substr(2));
+        $(this).prepend(mark);
+        $(this).prepend(unmark);        
+        unmark.hide();
+      }
+      else {
+        $(this).prepend(mark);
+        $(this).prepend(unmark);
+        mark.hide();
+      }
+    }
+  });
+}
 
 /*
 * Get the preview of required Tab from localStorage
