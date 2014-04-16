@@ -65,6 +65,8 @@ function displayTree(ht, groupBy) {
   });
 }
 
+
+
 function init(){
   $jit.Hypertree.Plot.NodeTypes.implement({
     'image': {
@@ -96,7 +98,10 @@ function init(){
       offsetY: 10,
       onShow: function(tip, node) {
         console.log(tip);
-        tip.innerHTML = '<b>' + node.data.title + '</b> <br/>' + node.data.url;
+        tip.innerHTML = '<b>' + node.data.title + '</b> <br/>' + node.data.url + '<br/>';
+        var img = getTabImage(node.id); // add preview under the url
+        if( img )
+            tip.appendChild(img);
       }
     },
     //id of the visualization container
@@ -184,6 +189,24 @@ function init(){
 }
 
 
+/*
+* Get the preview of required Tab from localStorage
+* @param {tabID} id of required tab
+* @returns {img} html element for the preview of required tab
+*/
+function getTabImage(tabID) {
+    var retrievedData = localStorage.getItem(tabID);
+    var img = document.createElement('img');
+    if (retrievedData === 'undefined')
+        return null;
+    img.src = retrievedData;
+        img.style.maxWidth = '180px';
+        img.border = '2px';
+
+    return img;
+}
+
+
 /**
  * Get the tab ID for the given tree node DOM element.
  * @param {Element} treeElem - DOM element of the node.
@@ -243,8 +266,7 @@ $(document).ready(function() {
     $('#' + nodeId).click();
     return false;
   });
-
-  addHoverToPreviewActions();
+  //addHoverToPreviewActions();
 
   init();
 });

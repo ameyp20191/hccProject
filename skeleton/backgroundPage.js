@@ -1,5 +1,6 @@
 var tabOpenerInfo = {};
 var tabsMarked = [];
+var tabQueue = [];
 
 // Store ID of a created tab's parent.
 // 
@@ -8,6 +9,34 @@ var tabsMarked = [];
 chrome.tabs.onCreated.addListener(function(tab) { 
     tabOpenerInfo[tab.id] = tab.openerTabId;
 });
+
+/*
+ * listener for preview of activated tab  
+*/
+chrome.tabs.onActivated.addListener(function (activeInfo) {
+    console.log(activeInfo.tabId);
+    var tabId = activeInfo.tabId;
+    chrome.tabs.captureVisibleTab(function (imgDataURL) {
+        localStorage.setItem(tabId.toString(), imgDataURL);
+    });
+});
+
+/*
+ * remove image data from localStorage when tab is closed 
+*/
+chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
+    localStorage.removeItem(tabId.toString());
+});
+
+/* 
+ * clear localStorage when window is closed, however it doesn't work
+ */
+chrome.window.onRemoved.addListener(function (windowId) {
+    chrome.windows.remove(windowId, function () {
+        localStorage.clear();
+    });
+});
+
 
 /**
  * Listen to message for tab marking
@@ -38,3 +67,4 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     chrome.tabs.executeScript(tabId, {code: "if (document.title.indexOf('★ ') == -1) document.title = '★ ' + document.title;"});
   }
 });
+
