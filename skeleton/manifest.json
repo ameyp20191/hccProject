@@ -16,8 +16,13 @@
                 "default": "Ctrl+Period"
             },
             "description": "Mark or unmark the current tab."
+        },
+        "_execute_browser_action": {
+            "suggested_key": {
+                "default": "Ctrl+Comma"
+            },
+            "description": "Show quick-links."
         }
-
     },
     "background": {
         "scripts": ["backgroundPage.js"],
