@@ -123,6 +123,8 @@ function init(groupBy){
       }
       
       $jit.util.addEvent(domElement, 'click', function () {
+        console.log('clicked ', domElement);
+        console.log(domElement);
         ht.onClick(node.id, {
           onComplete: function() {
             ht.controller.onComplete();
@@ -229,12 +231,15 @@ function addClickToAnnotation() {
         mark.hide();
         unmark.show();        
         chrome.runtime.sendMessage({action: "unmarkTab", tabId: tabID});
+        return false;           // Prevents node from centering
       });
       
       unmark.click(function() {
+        event.preventDefault();
         unmark.hide();
         mark.show();        
-        chrome.runtime.sendMessage({action: "markTab", tabId: tabID});        
+        chrome.runtime.sendMessage({action: "markTab", tabId: tabID});
+        return false;           // Prevents node from centering
       });
         
       if ($(this).text().indexOf('★ ') == 0) {      
