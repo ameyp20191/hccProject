@@ -104,6 +104,7 @@ function createFakeNode(url) {
   node.name = uri.domain();
   node.data.title = uri.domain();
   node.data.url = url;
+  node.data.domainNode = true;
   node.data.fake = true;
   return node;
 }
@@ -121,7 +122,6 @@ function tabsToTreeByUrl(params) {
   }
   var tree = {};
   var fakeDomainsAdded = {};
-
   var rootNode = {"id": "root-node",
                   "name": "Current window",
                   "data": {url: "/", title: "Current window"},

@@ -42,28 +42,6 @@ function tabToNode(tab) {
   return node;
 }
 
-function displayTree(ht, groupBy) {
-  chrome.tabs.query({}, function(tabs) {
-    var json;
-    if (groupBy == "sequence") {
-      json = tabsToTreeBySequence(tabs);
-    }
-    else if (groupBy === "url") {
-      json = tabsToTreeByUrl(tabs);
-    }
-    else { 
-      json = tabsToTreeBySequence(tabs);
-    }
-    
-    //load JSON data.
-    ht.loadJSON(json);
-    //compute positions and plot.
-    ht.refresh();
-    //end
-    ht.controller.onComplete();
-  });
-}
-
 
 function init(groupBy){
   $jit.Hypertree.Plot.NodeTypes.implement({
@@ -96,9 +74,12 @@ function init(groupBy){
       offsetX: 10,
       offsetY: 10,
       onShow: function(tip, node) {
-        if (node.data.fake) {
+        if (node.data.domainNode) {
           tip.innerHTML = '<b>' + node.data.title + '</b> <br/>';
           tip.innerHTML += 'Domain: ' + node.data.title + '<br/>';
+        }
+        else if (node.data.categoryNode) {
+          tip.innerHTML = 'Category: <b>' + node.data.title + '</b> <br/>';
         }
         else {
           tip.innerHTML = '<b>' + node.data.title + '</b> <br/>' + node.data.url + '<br/>';
@@ -201,6 +182,9 @@ function init(groupBy){
       else if (groupBy === "url") {
         json = tabsToTreeByUrl({tabs: tabs, useFakeNodes: true});
       }
+      else if (groupBy === "category") {
+        json = tabsToTreeByCategory(tabs);
+      }
       else {
         json = tabsToTreeBySequence(tabs);
       }
@@ -290,7 +274,13 @@ function setupTree(groupBy) {
   init(groupBy);
 }
 
-var groupBy;
+function setGroupBy(groupBy) {
+  chrome.extension.getBackgroundPage().groupBy = groupBy;
+}
+
+function getGroupBy() {
+  return chrome.extension.getBackgroundPage().groupBy;
+}
 
 $(document).ready(function() {
   $('body').on('click', 'a.tab-link', function() {
@@ -306,14 +296,13 @@ $(document).ready(function() {
   });
 
   $('body').on('change', 'input[type=radio]', function() {
-    groupBy = $(this).val();
+    var groupBy = $(this).val();
     setupTree(groupBy);
+    setGroupBy(groupBy);
     return false;
   });
 
-  // Set default group by criterion.
-  groupBy = 'url';
-  $('input[name=group-by][type=radio]').val([groupBy]);
+  $('input[name=group-by][type=radio]').val([getGroupBy()]);
 
-  setupTree(groupBy);
+  setupTree(getGroupBy());
 });

@@ -18,6 +18,7 @@
 
     <script language="javascript" type="text/javascript" src="groupbysequence.js"></script>
     <script language="javascript" type="text/javascript" src="groupbyurl.js"></script>
+    <script language="javascript" type="text/javascript" src="groupbycategory.js"></script>
     <script language="javascript" type="text/javascript" src="hypertree.js"></script>
   </head>
 
@@ -36,8 +37,17 @@
             Organize by:
           </p>
           <form>
-            <input type="radio" name="group-by" value="url">URL
-            <input type="radio" name="group-by" value="sequence">Sequence
+            <ul id="group-by-list">
+              <li>
+                <input type="radio" name="group-by" value="url">URL
+              </li>
+              <li>
+                <input type="radio" name="group-by" value="category">Category
+              </li>
+              <li>
+                <input type="radio" name="group-by" value="sequence">Sequence
+              </li>
+            </ul>
           </form>
 
         </div>

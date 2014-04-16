@@ -5,6 +5,8 @@ var categories={};
 var tempId;
 var tabQueue = [];
 
+var groupBy = 'url';            // Default tree grouping criterion
+
 chrome.commands.onCommand.addListener(function(command) {
   if (command === "launch-visualization") {
     chrome.tabs.create({url: "visualization/hypertree.html"});

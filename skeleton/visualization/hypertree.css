@@ -5,3 +5,9 @@
 .tip {
     min-width: 200px;
 }
+
+
+ul#group-by-list {
+    list-style: none;
+    padding-left: 10px;
+}
