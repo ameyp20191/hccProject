@@ -165,9 +165,14 @@ function init(groupBy){
       node.eachAdjacency(function(adj){
         var child = adj.nodeTo;
         if (child.data) {
-          var rel = (child.data.band == node.name) ? child.data.relation : node.data.relation;
-          html += "<li><a href='javascript:void(0)' class='tab-link' " +
-            "tab-id='" + child.id + "'>" + child.data.title + "</a></li>";
+          if (child.data.fake || child.id == 'root-node') {
+            html += "<li><a href='javascript:void(0)' class='node-link' " +
+              "node-id='" + child.id + "'>" + child.data.title + "</a></li>";
+          }
+          else {
+            html += "<li><a href='javascript:void(0)' class='tab-link' " +
+              "tab-id='" + child.id + "'>" + child.data.title + "</a></li>";
+          }
         }
       });
       html += "</ul>";
@@ -304,7 +309,7 @@ $(document).ready(function() {
 
   $('body').on('click', 'a.node-link', function() {
     var nodeId = $(this).attr('node-id');
-    $('#' + nodeId).click();
+    $(document.getElementById(nodeId)).click();
     return false;
   });
 

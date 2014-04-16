@@ -1,7 +1,6 @@
 function attachNodeByCategory(node, rootNode, categoryNodesByCategory) {
   var isCategoryNode = node.data.categoryNode;
   if (isCategoryNode) {
-    console.log(node);
     rootNode.children.push(node);
     return;
   }
