@@ -55,7 +55,6 @@ function displayTree(ht, groupBy) {
       json = tabsToTreeBySequence(tabs);
     }
     
-    console.log(json);
     //load JSON data.
     ht.loadJSON(json);
     //compute positions and plot.
@@ -97,7 +96,6 @@ function init(groupBy){
       offsetX: 10,
       offsetY: 10,
       onShow: function(tip, node) {
-        console.log(tip);
         tip.innerHTML = '<b>' + node.data.title + '</b> <br/>' + node.data.url + '<br/>';
         var img = getTabImage(node.id); // add preview under the url
         if( img )
@@ -183,8 +181,6 @@ function init(groupBy){
 
   function displayTree(groupBy) {
     chrome.tabs.query({}, function(tabs) {
-      console.log('groupBy = ');
-      console.log(groupBy);
       var json;
       if (groupBy === "sequence") {
         json = tabsToTreeBySequence(tabs);
@@ -196,7 +192,6 @@ function init(groupBy){
         json = tabsToTreeBySequence(tabs);
       }
 
-      console.log(json);
       //load JSON data.
       ht.loadJSON(json);
       //compute positions and plot.
@@ -258,7 +253,6 @@ $(document).ready(function() {
   });
 
   $('body').on('change', 'input[type=radio]', function() {
-    console.log('radio selected');
     groupBy = $(this).val();
     setupTree(groupBy);
     return false;

@@ -50,12 +50,12 @@ function getTabsById(tabs) {
 
 function tabsToTreeBySequence(tabs) {
   var tabsById = getTabsById(tabs);
-  var rootNode = {"id": "window-node",
+  var rootNode = {"id": "root-node",
                   "name": "Current window",
-                  "data": {},
+                  "data": {url: "", title: "Current window"},
                   "children": []
                  };
-  var treeById = {"window-node": rootNode};
+  var treeById = {"root-node": rootNode};
   
   for (var i=0; i<tabs.length; i++) {
     if (tabs[i].id in treeById) {

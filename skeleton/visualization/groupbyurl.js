@@ -123,8 +123,8 @@ function tabsToTreeByUrl(params) {
   var fakeDomainsAdded = {};
 
   var rootNode = {"id": "root-node",
-                  "name": "Root",
-                  "data": {url: "/"},
+                  "name": "Current window",
+                  "data": {url: "/", title: "Current window"},
                   "children": []
                  };
   for (var i=0; i<tabs.length; i++) {
