@@ -118,6 +118,10 @@ function init(groupBy){
     onCreateLabel: function(domElement, node){
       domElement.innerHTML = node.name;
       domElement.setAttribute("tab-id", node.id);
+      if (node.data.fake) {
+        domElement.setAttribute("fake", "true");
+      }
+      
       $jit.util.addEvent(domElement, 'click', function () {
         ht.onClick(node.id, {
           onComplete: function() {
@@ -208,13 +212,19 @@ function init(groupBy){
 function addClickToAnnotation() {  
   
   $('div.node').each(function() {
+    // No annotation for fake nodes
+    if ($(this).attr('fake') == 'true' || $(this).attr('id') == 'root-node') {
+      return;
+    }
+
     if ($(this).has('a').length == 0) {
-      var mark = $('<a/>', {class: 'mark',
+
+      var mark = $('<a/>', {'class': 'mark',
                         text: '★ '});
-      var unmark = $('<a/>', {class: 'unmark',
+      var unmark = $('<a/>', {'class': 'unmark',
                               text: '★ '});         
-      var tabID = $(this).attr('id');
-                              
+      var tabID = parseInt($(this).attr('id'));
+
       mark.click(function() {
         mark.hide();
         unmark.show();        
@@ -225,7 +235,7 @@ function addClickToAnnotation() {
         unmark.hide();
         mark.show();        
         chrome.runtime.sendMessage({action: "markTab", tabId: tabID});        
-      })
+      });
         
       if ($(this).text().indexOf('★ ') == 0) {      
         $(this).html($(this).text().substr(2));
