@@ -31,7 +31,7 @@ chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
 /* 
  * clear localStorage when window is closed, however it doesn't work
  */
-chrome.window.onRemoved.addListener(function (windowId) {
+chrome.windows.onRemoved.addListener(function (windowId) {
     chrome.windows.remove(windowId, function () {
         localStorage.clear();
     });
