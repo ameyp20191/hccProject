@@ -96,7 +96,13 @@ function init(groupBy){
       offsetX: 10,
       offsetY: 10,
       onShow: function(tip, node) {
-        tip.innerHTML = '<b>' + node.data.title + '</b> <br/>' + node.data.url + '<br/>';
+        if (node.data.fake) {
+          tip.innerHTML = '<b>' + node.data.title + '</b> <br/>';
+          tip.innerHTML += 'Domain: ' + node.data.title + '<br/>';
+        }
+        else {
+          tip.innerHTML = '<b>' + node.data.title + '</b> <br/>' + node.data.url + '<br/>';
+        }
         var img = getTabImage(node.id); // add preview under the url
         if( img )
             tip.appendChild(img);
@@ -119,6 +125,11 @@ function init(groupBy){
     },
     onBeforeCompute: function(node){
       Log.write("centering");
+    },
+    onBeforePlotNode: function(node) {
+      if (node.data.fake) {
+        node.data.$color = "#922";
+      }
     },
     //Attach event handlers and add text to the
     //labels. This method is only triggered on label
