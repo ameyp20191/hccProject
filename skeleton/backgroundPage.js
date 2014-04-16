@@ -102,14 +102,12 @@ function process()
 	var bgWholePage = new DOMParser().parseFromString(bg.wholePage, 'text/html');
         var oneTopic = document.evaluate(EurPlnPath, bgWholePage, null, XPathResult.STRING_TYPE, null);
 	var tempStr = oneTopic.stringValue.trim();
-        console.log(tempStr);
 	if(tempStr){
 		categories[tempId] = tempStr.split(", ");
 	}
 	else{
 		categories[tempId] = null;
 	}
-        console.log(categories);
 }
 
 /**
@@ -122,7 +120,6 @@ chrome.tabs.onUpdated.addListener(function getCategory(tabId, info, tab)
         var U = new URI(tab.url);
         tempId = tabId;
         var serviceURL = "http://domain.opendns.com/" + U.domain();
-        console.log(serviceURL);
 	req = new XMLHttpRequest();
         req.open("GET", serviceURL);
         req.onload = process;
