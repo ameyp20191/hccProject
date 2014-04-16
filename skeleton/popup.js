@@ -9,6 +9,7 @@ function showMarkAction(node) {
       markTab();
       unmarkLinkDiv.show();
       markLinkDiv.hide();
+      updateMarkedTabsLinks();
     });
 
     var unmarkLink = $('<input/>', {id: 'unmark', type: 'button', value: 'Unmark'});
@@ -17,6 +18,7 @@ function showMarkAction(node) {
       unmarkTab();
       markLinkDiv.show();
       unmarkLinkDiv.hide();
+      updateMarkedTabsLinks();
     });
 
     if (background.tabsMarked.indexOf(tabs[0].id) == -1) {
@@ -88,10 +90,15 @@ function showMarkedTabs(node) {
   var heading = $('<h2/>', {text: 'Marked tabs'}).appendTo(node);
   var content = $('<div/>', {id: 'marked-tabs-content'}).appendTo(node);
 
+  showMarkedTabsContent(content);
+}
+
+function showMarkedTabsContent(content) {
   var background = chrome.extension.getBackgroundPage();
   var tabsMarked = background.tabsMarked;
 
   for (var i=0; i<tabsMarked.length; i++) {
+    console.log(tabsMarked[i]);
     var tabId = tabsMarked[i];
     chrome.tabs.get(tabId, function(tab) {
       var tabLinkDiv = $('<div/>', {}).appendTo(content);
@@ -99,6 +106,13 @@ function showMarkedTabs(node) {
                  text: tab.title, tabId: tab.id}).appendTo(tabLinkDiv);
     });
   }
+}
+
+function updateMarkedTabsLinks(response) {
+  console.log('updating marked tabs links!');
+  var content = $('#marked-tabs-content');
+  content.empty();
+  showMarkedTabsContent(content);
 }
 
 $(document).ready(function() {
@@ -156,7 +170,7 @@ function markTab()
 {
   chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
     console.log(tabs[0].id);
-    chrome.runtime.sendMessage({action: "markTab", tabId: tabs[0].id});
+    chrome.runtime.sendMessage({action: "markTab", tabId: tabs[0].id}, updateMarkedTabsLinks);
   });
 }
 
@@ -167,6 +181,6 @@ function unmarkTab()
 {
   chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
     console.log(tabs[0].id);
-    chrome.runtime.sendMessage({action: "unmarkTab", tabId: tabs[0].id});
+    chrome.runtime.sendMessage({action: "unmarkTab", tabId: tabs[0].id}, updateMarkedTabsLinks);
   });
 }
