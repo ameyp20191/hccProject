@@ -1,12 +1,13 @@
 var tabOpenerInfo = {};
 var tabsMarked = [];
 var wholePage;
-var categories={};
+var categories = {};
 var tempId;
 var tabQueue = [];
 
 var groupBy = 'url';            // Default tree grouping criterion
 
+// Handle keyboard shortcuts
 chrome.commands.onCommand.addListener(function(command) {
   if (command === "launch-visualization") {
     chrome.tabs.create({url: "visualization/hypertree.html"});
@@ -121,7 +122,7 @@ chrome.tabs.onUpdated.addListener(function getCategory(tabId, info, tab)
         if(info.url){
         var U = new URI(tab.url);
         tempId = tabId;
-        var serviceURL = "http://domain.opendns.com/" + U.domain();
+        var serviceURL = "http://domain.opendns.com/" + U.hostname();
 	req = new XMLHttpRequest();
         req.open("GET", serviceURL);
         req.onload = process;
