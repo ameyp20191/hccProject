@@ -181,8 +181,8 @@ function init(groupBy){
         var child = adj.nodeTo;
         if (child.data) {
           var rel = (child.data.band == node.name) ? child.data.relation : node.data.relation;
-          html += "<div><a href='javascript:void(0)' class='tab-link' " +
-            "tab-id='" + child.id + "'>" + child.data.title + "</a></div>";
+          html += "<li><a href='javascript:void(0)' class='tab-link' " +
+            "tab-id='" + child.id + "'>" + child.data.title + "</a></li>";
         }
       });
       html += "</ul>";

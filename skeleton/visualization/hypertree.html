@@ -2,11 +2,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Hypertree - Tree Animation</title>
+    <title>Visualize tabs</title>
 
     <!-- CSS Files -->
-    <link type="text/css" href="css/base.css" rel="stylesheet" />
-    <link type="text/css" href="css/Hypertree.css" rel="stylesheet" />
+    <link type="text/css" href="base.css" rel="stylesheet" />
+    <link type="text/css" href="hypertree.css" rel="stylesheet" />
 
     <script src="../jquery-2.1.0.min.js"></script>
     <script src="../URI.js"></script>
@@ -22,7 +22,6 @@
 
   <body>
     <div id="container">
-      <img src="icon.png" id="my-icon"/>
       <div id="left-container">
         <div class="text">
           <h4>
@@ -36,8 +35,8 @@
             Organize by:
           </p>
           <form>
-            <input type="radio" name="group-by" value="sequence">Sequence
             <input type="radio" name="group-by" value="url">URL
+            <input type="radio" name="group-by" value="sequence">Sequence
           </form>
 
         </div>
