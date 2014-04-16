@@ -102,8 +102,8 @@ function showMarkedTabsContent(content) {
     var tabId = tabsMarked[i];
     chrome.tabs.get(tabId, function(tab) {
       var tabLinkDiv = $('<div/>', {}).appendTo(content);
-      $('<a/>', {'class': 'tab-link', href: 'javascript:void(0)',
-                 text: tab.title, tabId: tab.id}).appendTo(tabLinkDiv);
+      $('<button/>', {'class': 'tab-link',
+                      text: tab.title, tabId: tab.id}).appendTo(tabLinkDiv);
     });
   }
 }
@@ -123,10 +123,9 @@ $(document).ready(function() {
   });
 
   // Clicking a tab link switches to the tab
-  $('body').on('click', 'a.tab-link', function() {
+  $('body').on('click', 'button.tab-link', function(event) {
     var tabId = parseInt($(this).attr('tabId'));
     chrome.tabs.update(tabId, {active: true}, function() {});
-    return false;
   });
 
   chrome.tabs.query(

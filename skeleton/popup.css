@@ -22,6 +22,7 @@ h2 {
 
 a {
     font-size: 0.8em;
+    color: navy;
     text-decoration: none;
 }
 
@@ -36,4 +37,21 @@ a:hover {
 .current-tab-info {
     text-align: center;
     font-weight: italic;
+}
+
+button.tab-link {
+    border: none;
+    background-color: transparent;
+    color: navy;
+    cursor: pointer;
+    font-size: 0.8em;
+    font-family: cantarell;
+    margin: 0;
+    padding: 0;
+    outline: none;
+    outline-offset: 0;
+}
+
+.tab-link:hover {
+    color: red;
 }
