@@ -2,6 +2,24 @@ var tabOpenerInfo = {};
 var tabsMarked = [];
 var tabQueue = [];
 
+chrome.commands.onCommand.addListener(function(command) {
+  if (command === "launch-visualization") {
+    chrome.tabs.create({url: "visualization/hypertree.html"});
+  }
+  else if (command === "toggle-mark-tab") {
+    chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
+      var tabId = tabs[0].id;
+      if (tabsMarked.indexOf(tabId) >= 0) {
+        // tab is marked, unmark it
+        chrome.runtime.sendMessage({action: "unmarkTab", tabId: tabId});
+      }
+      else {
+        chrome.runtime.sendMessage({action: "markTab", tabId: tabId});
+      }
+    });
+  }
+});
+
 // Store ID of a created tab's parent.
 // 
 // Strangely, the native tab.openerTabId property is always undefined
