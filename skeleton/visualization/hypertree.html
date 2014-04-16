@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Visualize tabs</title>
+
+    <!-- CSS Files -->
+    <link type="text/css" href="base.css" rel="stylesheet" />
+    <link type="text/css" href="hypertree.css" rel="stylesheet" />
+
+    <script src="../jquery-2.1.0.min.js"></script>
+    <script src="../URI.js"></script>
+
+
+    <!-- JIT Library File -->
+    <script language="javascript" type="text/javascript" src="Jit/jit.js"></script>
+
+    <script language="javascript" type="text/javascript" src="groupbysequence.js"></script>
+    <script language="javascript" type="text/javascript" src="groupbyurl.js"></script>
+    <script language="javascript" type="text/javascript" src="hypertree.js"></script>
+  </head>
+
+  <body>
+    <div id="container">
+      <div id="left-container">
+        <div class="text">
+          <h4>
+            Tab Visualization
+          </h4> 
+          <p>
+            Hover over a node for to see a preview of the tab.
+          </p>
+
+          <p>
+            Organize by:
+          </p>
+          <form>
+            <input type="radio" name="group-by" value="url">URL
+            <input type="radio" name="group-by" value="sequence">Sequence
+          </form>
+
+        </div>
+        <div id="id-list"></div>
+      </div>
+
+      <div id="center-container">
+        <div id="infovis"></div>    
+      </div>
+
+      <div id="right-container">
+        <div id="inner-details"></div>
+      </div>
+
+      <div id="log"></div>
+    </div>
+  </body>
+</html>
