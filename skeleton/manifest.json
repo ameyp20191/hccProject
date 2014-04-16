@@ -2,30 +2,10 @@
     "manifest_version": 2,
 
     "name": "EasyNavigator",
-    "description": "Browsing made more efficient.",
-    "version": "0.1",
-    "commands": {
-        "launch-visualization": {
-            "suggested_key": {
-                "default": "Ctrl+Shift+V"
-            },
-            "description": "Launch the tabs visualization."
-        },
-        "toggle-mark-tab": {
-            "suggested_key": {
-                "default": "Ctrl+Period"
-            },
-            "description": "Mark or unmark the current tab."
-        },
-        "_execute_browser_action": {
-            "suggested_key": {
-                "default": "Ctrl+Comma"
-            },
-            "description": "Show quick-links."
-        }
-    },
+    "description": "This extension Exploits Browsing Context for Efﬁcient Revisitation and Tab Switching",
+    "version": "1.0",
     "background": {
-        "scripts": ["backgroundPage.js"],
+        "scripts": ["URI.js","backgroundPage.js"],
         "persistent": true
     },
     "permissions": [

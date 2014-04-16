@@ -1,5 +1,8 @@
 var tabOpenerInfo = {};
 var tabsMarked = [];
+var wholePage;
+var categories={};
+var tempId;
 var tabQueue = [];
 
 chrome.commands.onCommand.addListener(function(command) {
@@ -86,3 +89,43 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   }
 });
 
+/**
+  * This function will process the data received from openDNS and update the categories.
+**/
+
+function process()
+{
+        wholePage = req.responseText;
+        chrome.browserAction.setBadgeText({text: ''});
+        var bg = chrome.extension.getBackgroundPage();
+	var EurPlnPath = '//*[@id="maincontent"]/div/div[1]/div[2]/h3/span';
+	var bgWholePage = new DOMParser().parseFromString(bg.wholePage, 'text/html');
+        var oneTopic = document.evaluate(EurPlnPath, bgWholePage, null, XPathResult.STRING_TYPE, null);
+	var tempStr = oneTopic.stringValue.trim();
+        console.log(tempStr);
+	if(tempStr){
+		categories[tempId] = tempStr.split(", ");
+	}
+	else{
+		categories[tempId] = null;
+	}
+        console.log(categories);
+}
+
+/**
+  * This function will send request to openDNS to provide updated tab category
+**/
+
+chrome.tabs.onUpdated.addListener(function getCategory(tabId, info, tab)
+{
+        if(info.url){
+        var U = new URI(tab.url);
+        tempId = tabId;
+        var serviceURL = "http://domain.opendns.com/" + U.domain();
+        console.log(serviceURL);
+	req = new XMLHttpRequest();
+        req.open("GET", serviceURL);
+        req.onload = process;
+        req.send();
+	}
+});
