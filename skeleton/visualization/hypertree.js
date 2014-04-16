@@ -5,7 +5,7 @@ var labelType, useGradients, nativeTextSupport, animate;
       iStuff = ua.match(/iPhone/i) || ua.match(/iPad/i),
       typeOfCanvas = typeof HTMLCanvasElement,
       nativeCanvasSupport = (typeOfCanvas == 'object' || typeOfCanvas == 'function'),
-      textSupport = nativeCanvasSupport 
+      textSupport = nativeCanvasSupport
         && (typeof document.createElement('canvas').getContext('2d').fillText == 'function');
   //I'm setting this based on the fact that ExCanvas provides text support for IE
   //and that as of today iPhone/iPad current text support is lame
@@ -15,10 +15,11 @@ var labelType, useGradients, nativeTextSupport, animate;
   animate = !(iStuff || !nativeCanvasSupport);
 })();
 
+
 var Log = {
   elem: false,
   write: function(text){
-    if (!this.elem) 
+    if (!this.elem)
       this.elem = document.getElementById('log');
     this.elem.innerHTML = text;
     this.elem.style.left = (500 - this.elem.offsetWidth / 2) + 'px';
@@ -42,6 +43,7 @@ function tabToNode(tab) {
 }
 
 
+<<<<<<< HEAD
 function displayTree(ht, groupBy) {
   chrome.tabs.query({}, function(tabs) {
     var json;
@@ -68,6 +70,9 @@ function displayTree(ht, groupBy) {
 
 
 function init(){
+=======
+function init(groupBy){
+>>>>>>> 895c1c189e4721b3ba695c083f73562646c16189
   $jit.Hypertree.Plot.NodeTypes.implement({
     'image': {
       'render': function(node, canvas) {
@@ -79,8 +84,9 @@ function init(){
       }
     }
   });
-  
+
   var infovis = document.getElementById('infovis');
+  infovis.innerHTML = '';
   var w = infovis.offsetWidth - 50, h = infovis.offsetHeight - 50;
   //var w = 1280, h = 1024;
   //init Hypertree
@@ -157,13 +163,13 @@ function init(){
       var w = domElement.offsetWidth;
       style.left = (left - w / 2) + 'px';
     },
-    
+
     onComplete: function(){
       //Log.write("done");
       Log.write(" ");
 
       //Build the right column relations list.
-      //This is done by collecting the information (stored in the data property) 
+      //This is done by collecting the information (stored in the data property)
       //for all the nodes adjacent to the centered node.
       var node = ht.graph.getClosestNodeToOrigin("current");
       var html = "<h4>" + node.name + "</h4><b>Connections:</b>";
@@ -172,12 +178,8 @@ function init(){
         var child = adj.nodeTo;
         if (child.data) {
           var rel = (child.data.band == node.name) ? child.data.relation : node.data.relation;
-          // html += "<a href='#' class='tab-link' " + 
-          //     "tab-id='" + child.id + "'>" + child.name + " " + 
-          //     "<div class=\"relation\">(relation: " + rel + ")</div></a>";
-          html += "<div><a href='#' class='tab-link' " + 
+          html += "<div><a href='javascript:void(0)' class='tab-link' " +
             "tab-id='" + child.id + "'>" + child.data.title + "</a></div>";
-
         }
       });
       html += "</ul>";
@@ -185,7 +187,32 @@ function init(){
     }
   });
 
-  displayTree(ht, 'url');
+  function displayTree(groupBy) {
+    chrome.tabs.query({}, function(tabs) {
+      console.log('groupBy = ');
+      console.log(groupBy);
+      var json;
+      if (groupBy === "sequence") {
+        json = tabsToTreeBySequence(tabs);
+      }
+      else if (groupBy === "url") {
+        json = tabsToTreeByUrl({tabs: tabs, useFakeNodes: true});
+      }
+      else {
+        json = tabsToTreeBySequence(tabs);
+      }
+
+      console.log(json);
+      //load JSON data.
+      ht.loadJSON(json);
+      //compute positions and plot.
+      ht.refresh();
+      //end
+      ht.controller.onComplete();
+    });
+  }
+
+  displayTree(groupBy);
 }
 
 
@@ -236,7 +263,6 @@ function addHoverToPreviewActions() {
   }
 
   var hoverTimeout;
-
   $('body').on('mouseenter', 'div.node', function() {
     var tabId = getTabId(this);
     var previewWaitTime = 1000;
@@ -254,6 +280,12 @@ function addHoverToPreviewActions() {
   });
 }
 
+function setupTree(groupBy) {
+  init(groupBy);
+}
+
+var groupBy;
+
 $(document).ready(function() {
   $('body').on('click', 'a.tab-link', function() {
     var tabId = getTabId(this);
@@ -266,7 +298,21 @@ $(document).ready(function() {
     $('#' + nodeId).click();
     return false;
   });
+<<<<<<< HEAD
   //addHoverToPreviewActions();
+=======
 
-  init();
+  $('body').on('change', 'input[type=radio]', function() {
+    console.log('radio selected');
+    groupBy = $(this).val();
+    setupTree(groupBy);
+    return false;
+  });
+>>>>>>> 895c1c189e4721b3ba695c083f73562646c16189
+
+  // Set default group by criterion.
+  groupBy = 'url';
+  $('input[name=group-by][type=radio]').val([groupBy]);
+  addHoverToPreviewActions();
+  setupTree(groupBy);
 });

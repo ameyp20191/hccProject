@@ -35,8 +35,7 @@ function isAncestorOf(nodeA, nodeB) {
     return false;
   }
 
-  // If path of URL B contains path of URL A, assume URL B is a child
-  // of A
+  // If path of B contains path of A, assume B is a child of A
   if (pathB.indexOf(pathA) >= 0) {
     return true;
   }
@@ -92,14 +91,37 @@ function attachNode(node, rootNode) {
   }
 }
 
+/**
+ * Create a fake node given the URL.
+ * It is fake because there is no tab associated with it.
+ * @param {String} url - URL in the node.
+ * @returns {Node} node - node for this URL.
+ */
+function createFakeNode(url) {
+  var node = {"data": {}, "children": []};
+  node.id = url;                // If ID is randomized, the node positions are unpredictable
+  var uri = new URI(url);
+  node.name = uri.domain();
+  node.data.title = uri.domain();
+  node.data.url = url;
+  node.data.fake = true;
+  return node;
+}
 
 /**
  * Construct tree from tabs based on URL.
- * @param {array} tabs - Array of tabs.
+ * @param {Object} params - {tabs: array of tabs, useFakeNodes: whether to create fake nodes for domains}
  * @returns {Node} rootNode - root node of tree.
  */
-function tabsToTreeByUrl(tabs) {
+function tabsToTreeByUrl(params) {
+  var tabs = params.tabs;
+  var useFakeNodes = params.useFakeNodes;
+  if (useFakeNodes == undefined) {
+    useFakeNodes = true;
+  }
   var tree = {};
+  var fakeDomainsAdded = {};
+
   var rootNode = {"id": "root-node",
                   "name": "Root",
                   "data": {url: "/"},
@@ -107,8 +129,19 @@ function tabsToTreeByUrl(tabs) {
                  };
   for (var i=0; i<tabs.length; i++) {
     var tab = tabs[i];
-    var node = tabToNode(tab);
-    attachNode(node, rootNode);
+    var tabNode = tabToNode(tab);
+    var domain = new URI(tab.url).domain();
+
+    // Insert fake nodes for domain if required
+    if (useFakeNodes && !(domain in fakeDomainsAdded)) {
+      var domainURI = new URI(domain);
+      domainURI.protocol("http");  // Without protocol, no grouping happens. Investigate.
+
+      var domainNode = createFakeNode(domainURI.valueOf());
+      attachNode(domainNode, rootNode);
+      fakeDomainsAdded[domain] = true;
+    }
+    attachNode(tabNode, rootNode);
   }
   return rootNode;
 }
