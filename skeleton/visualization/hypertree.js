@@ -123,8 +123,6 @@ function init(groupBy){
       }
       
       $jit.util.addEvent(domElement, 'click', function () {
-        console.log('clicked ', domElement);
-        console.log(domElement);
         ht.onClick(node.id, {
           onComplete: function() {
             ht.controller.onComplete();
