@@ -42,8 +42,6 @@ function tabToNode(tab) {
   return node;
 }
 
-
-<<<<<<< HEAD
 function displayTree(ht, groupBy) {
   chrome.tabs.query({}, function(tabs) {
     var json;
@@ -68,11 +66,7 @@ function displayTree(ht, groupBy) {
 }
 
 
-
-function init(){
-=======
 function init(groupBy){
->>>>>>> 895c1c189e4721b3ba695c083f73562646c16189
   $jit.Hypertree.Plot.NodeTypes.implement({
     'image': {
       'render': function(node, canvas) {
@@ -224,7 +218,7 @@ function init(groupBy){
 function getTabImage(tabID) {
     var retrievedData = localStorage.getItem(tabID);
     var img = document.createElement('img');
-    if (retrievedData === 'undefined')
+    if (retrievedData === undefined || retrievedData === null)
         return null;
     img.src = retrievedData;
         img.style.maxWidth = '180px';
@@ -244,42 +238,6 @@ function getTabId(treeElem) {
 }
 
 
-/**
- * Add event listeners to show a tab briefly on hovering over its node.
- */
-function addHoverToPreviewActions() {
-  /**
-   * Switches to a tab for a given time and switches back.
-   * @param {number} tabId - ID of the tab to preview.
-   * @param {number} orgTabId - ID of the original tab.
-   * @param {number} previewTime - Time to show the tab for.
-   */
-  function previewTab(tabId, orgTabId, previewTime) {
-    chrome.tabs.update(tabId, {active: true}, function(tab) {
-      setTimeout(function() {
-        chrome.tabs.update(orgTabId, {active: true}, function() {});
-      }, previewTime);
-    });
-  }
-
-  var hoverTimeout;
-  $('body').on('mouseenter', 'div.node', function() {
-    var tabId = getTabId(this);
-    var previewWaitTime = 1000;
-    var previewDuration = 500;
-    chrome.tabs.getCurrent(function(tab) {
-      var myTabId = tab.id;
-      hoverTimeout = setTimeout(function() {
-        previewTab(tabId, myTabId, previewDuration);
-      }, previewWaitTime);
-    });
-  });
-
-  $('body').on('mouseleave', 'div.node', function() {
-    clearTimeout(hoverTimeout);
-  });
-}
-
 function setupTree(groupBy) {
   init(groupBy);
 }
@@ -298,9 +256,6 @@ $(document).ready(function() {
     $('#' + nodeId).click();
     return false;
   });
-<<<<<<< HEAD
-  //addHoverToPreviewActions();
-=======
 
   $('body').on('change', 'input[type=radio]', function() {
     console.log('radio selected');
@@ -308,11 +263,10 @@ $(document).ready(function() {
     setupTree(groupBy);
     return false;
   });
->>>>>>> 895c1c189e4721b3ba695c083f73562646c16189
 
   // Set default group by criterion.
   groupBy = 'url';
   $('input[name=group-by][type=radio]').val([groupBy]);
-  addHoverToPreviewActions();
+
   setupTree(groupBy);
 });
