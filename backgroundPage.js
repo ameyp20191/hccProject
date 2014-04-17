@@ -2,7 +2,6 @@ var tabOpenerInfo = {};
 var tabsMarked = [];
 var wholePage;
 var categories = {};
-var tempId;
 var tabQueue = [];
 
 var groupBy = 'url';            // Default tree grouping criterion
@@ -93,39 +92,38 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 });
 
 /**
-  * This function will process the data received from openDNS and update the categories.
-**/
-
-function process()
-{
-        wholePage = req.responseText;
-        chrome.browserAction.setBadgeText({text: ''});
-        var bg = chrome.extension.getBackgroundPage();
-	var EurPlnPath = '//*[@id="maincontent"]/div/div[1]/div[2]/h3/span';
-	var bgWholePage = new DOMParser().parseFromString(bg.wholePage, 'text/html');
-        var oneTopic = document.evaluate(EurPlnPath, bgWholePage, null, XPathResult.STRING_TYPE, null);
-	var tempStr = oneTopic.stringValue.trim();
-	if(tempStr){
-		categories[tempId] = tempStr.split(", ");
-	}
-	else{
-		categories[tempId] = null;
-	}
-}
-
-/**
-  * This function will send request to openDNS to provide updated tab category
-**/
-
-chrome.tabs.onUpdated.addListener(function getCategory(tabId, info, tab)
-{
-        if(info.url){
-        var U = new URI(tab.url);
-        tempId = tabId;
-        var serviceURL = "http://domain.opendns.com/" + U.hostname();
-	req = new XMLHttpRequest();
-        req.open("GET", serviceURL);
-        req.onload = process;
-        req.send();
-	}
+ * This function will send request to openDNS to provide updated tab category
+ */
+chrome.tabs.onUpdated.addListener(function(tabId, info, tab) {
+  // Only get category if URL has changed
+  if (info.url) {
+    getCategory(tabId, tab.url);
+  }
 });
+
+function getCategory(tabId, url) {
+  var U = new URI(url);
+  var openDns = new URI("http://domain.opendns.com");
+  var serviceURL = openDns.path(U.hostname()).valueOf();
+  var req = new XMLHttpRequest();
+  req.open("GET", serviceURL);
+
+  req.onload = function() {
+    // Process the data received from OpenDNS and update the categories.
+    wholePage = req.responseText;
+    chrome.browserAction.setBadgeText({text: ''});
+    var bg = chrome.extension.getBackgroundPage();
+    var EurPlnPath = '//*[@id="maincontent"]/div/div[1]/div[2]/h3/span';
+    var bgWholePage = new DOMParser().parseFromString(bg.wholePage, 'text/html');
+    var oneTopic = document.evaluate(EurPlnPath, bgWholePage, null, XPathResult.STRING_TYPE, null);
+    var tempStr = oneTopic.stringValue.trim();
+    if (tempStr) {
+      categories[tabId] = tempStr.split(", ");
+    }
+    else {
+      categories[tabId] = null;
+    }
+  };
+
+  req.send();
+}
