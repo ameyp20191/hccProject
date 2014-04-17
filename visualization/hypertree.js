@@ -42,7 +42,7 @@ function tabToNode(tab) {
   return node;
 }
 
-
+var ht;
 function init(groupBy){
   $jit.Hypertree.Plot.NodeTypes.implement({
     'image': {
@@ -61,7 +61,7 @@ function init(groupBy){
   var w = infovis.offsetWidth - 50, h = infovis.offsetHeight - 50;
   //var w = 1280, h = 1024;
   //init Hypertree
-  var ht = new $jit.Hypertree({
+  ht = new $jit.Hypertree({
     duration: 1000,
     Navigation: {
       enable: true,
@@ -182,34 +182,84 @@ function init(groupBy){
     }
   });
 
-  function displayTree(groupBy) {
-    chrome.tabs.query({}, function(tabs) {
-      var json;
-      if (groupBy === "sequence") {
-        json = tabsToTreeBySequence(tabs);
-      }
-      else if (groupBy === "url") {
-        json = tabsToTreeByUrl({tabs: tabs, useFakeNodes: true});
-      }
-      else if (groupBy === "category") {
-        json = tabsToTreeByCategory(tabs);
-      }
-      else {
-        json = tabsToTreeBySequence(tabs);
-      }
-
-      //load JSON data.
-      ht.loadJSON(json);
-      //compute positions and plot.
-      ht.refresh();
-      //end
-      ht.controller.onComplete();
-    });
-  }
-
   displayTree(groupBy);
 }
 
+function displayTree(groupBy) {
+  chrome.tabs.query({}, function(tabs) {
+    var json;
+    if (groupBy !== "category") {
+      $('div.get-missing-categories').hide();
+    }
+
+    if (groupBy === "sequence") {
+      json = tabsToTreeBySequence(tabs);
+    }
+    else if (groupBy === "url") {
+      json = tabsToTreeByUrl({tabs: tabs, useFakeNodes: true});
+    }
+    else if (groupBy === "category") {
+      setMissingCategoriesDivState();
+      json = tabsToTreeByCategory(tabs);
+    }
+    else {
+      json = tabsToTreeBySequence(tabs);
+    }
+
+    //load JSON data.
+    ht.loadJSON(json);
+    //compute positions and plot.
+    ht.refresh();
+    //end
+    ht.controller.onComplete();
+  });
+}
+
+/* Show the missing categories button if and only if there are tabs
+ * for which categories have not been fetched.
+ *
+ * Note that this only refers to the lack of 'fetching', and does not
+ * include tabs for which fetching was attempted but did not produce
+ * any useful results.
+ */
+function setMissingCategoriesDivState() {
+  var shown = false;
+  var categories = chrome.extension.getBackgroundPage().categories;
+  chrome.tabs.query({}, function(tabs) {
+    for (var i=0; i<tabs.length; i++) {
+      var tabId = tabs[i].id;
+      if (!(tabId in categories)) {
+        shown = true;
+        break;
+      }
+    }
+    var missingCategoriesDiv = $('div.get-missing-categories');
+    if (shown) {
+      missingCategoriesDiv.show();
+    }
+    else {
+      missingCategoriesDiv.hide();
+    }
+  });
+}
+
+/**
+ * Get categories for the necessary tabs and redraw the tree.
+ */
+function getCategoriesAndUpdateTree() {
+  chrome.tabs.query({}, function(tabs) {
+    getRemainingCategories(tabs, function(tabId, category) {
+      var newJson = tabsToTreeByCategory(tabs);
+      ht.op.morph(newJson, {
+        type: 'replot',
+        duration: 200,
+        hideLabels: false,
+        transition: $jit.Trans.Quart.easeOut
+      });
+      setMissingCategoriesDivState();
+    });
+  });
+}
 
 /**
  * Add markings to annotate tabs
@@ -318,6 +368,10 @@ $(document).ready(function() {
     setupTree(groupBy);
     setGroupBy(groupBy);
     return false;
+  });
+
+  $('body').on('click', 'div.get-missing-categories input', function() {
+    getCategoriesAndUpdateTree();
   });
 
   $('input[name=group-by][type=radio]').val([getGroupBy()]);

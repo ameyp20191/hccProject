@@ -20,11 +20,25 @@ function createCategoryNode(category) {
   return node;
 }
 
+// Get categories for tabs for which no fetching has been attempted
+function getRemainingCategories(tabs, callback) {
+  var background = chrome.extension.getBackgroundPage();
+  var categories = background.categories;
+  for (var i=0; i<tabs.length; i++) {
+    var tabId = tabs[i].id;
+    var url = tabs[i].url;
+    if (!(tabId in categories)) {
+      background.getCategory(tabId, url, callback);
+    }
+  }
+}
+
 function tabsToTreeByCategory(tabs) {
   var tree = {};
   var categoriesAdded = {};
   var defaultCategory = ["Uncategorized"];
-  var categories = chrome.extension.getBackgroundPage().categories;
+  var background = chrome.extension.getBackgroundPage();
+  var categories = background.categories;
   var categoryNodesByCategory = {};
   
   var rootNode = {"id": "root-node",

@@ -24,3 +24,7 @@ a.node-link {
 a.node-link:hover {
     color: red;
 }
+
+.get-missing-categories {
+    display: none;
+}

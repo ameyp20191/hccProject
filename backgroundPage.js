@@ -6,7 +6,9 @@ var tabQueue = [];
 
 var groupBy = 'url';            // Default tree grouping criterion
 
-// Handle keyboard shortcuts
+/*
+ * Handle keyboard shortcuts
+ */
 chrome.commands.onCommand.addListener(function(command) {
   if (command === "launch-visualization") {
     chrome.tabs.create({url: "visualization/hypertree.html"});
@@ -25,10 +27,11 @@ chrome.commands.onCommand.addListener(function(command) {
   }
 });
 
-// Store ID of a created tab's parent.
-// 
-// Strangely, the native tab.openerTabId property is always undefined
-// when accessed by hypertree.js.
+/**
+ * Store ID of a created tab's parent. Strangely, the native
+ * tab.openerTabId property is always undefined when accessed by
+ * hypertree.js.
+ */
 chrome.tabs.onCreated.addListener(function(tab) { 
     tabOpenerInfo[tab.id] = tab.openerTabId;
 });
@@ -101,11 +104,18 @@ chrome.tabs.onUpdated.addListener(function(tabId, info, tab) {
   }
 });
 
-function getCategory(tabId, url) {
+/**
+ * Get category for a URL from OpenDNS, update `categories`.
+ * @param {number} tabId - Tab ID
+ * @param {String} url - URL to categorize
+ * @param {function} callback - function(tabId, category) callback
+ */
+function getCategory(tabId, url, callback) {
   var U = new URI(url);
   var openDns = new URI("http://domain.opendns.com");
   var serviceURL = openDns.path(U.hostname()).valueOf();
   var req = new XMLHttpRequest();
+  req.timeout = 5000;
   req.open("GET", serviceURL);
 
   req.onload = function() {
@@ -123,7 +133,10 @@ function getCategory(tabId, url) {
     else {
       categories[tabId] = null;
     }
-  };
 
+    if (callback) {
+      callback(tabId, categories[tabId]);
+    }
+  };
   req.send();
 }
