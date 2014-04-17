@@ -25,7 +25,7 @@
          }
      },
     "background": {
-        "scripts": ["URI.js","backgroundPage.js"],
+        "scripts": ["thirdparty/URI.js","backgroundPage.js"],
         "persistent": true
     },
     "permissions": [
