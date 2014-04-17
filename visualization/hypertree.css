@@ -25,6 +25,14 @@ a.node-link:hover {
     color: red;
 }
 
+a.switch-to-tab {
+    color: darkgreen;
+}
+
+a.switch-to-tab:hover {
+    color: red;
+}
+
 .get-missing-categories {
     display: none;
 }

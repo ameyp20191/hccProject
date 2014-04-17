@@ -179,6 +179,7 @@ function init(groupBy){
       $jit.id('inner-details').innerHTML = html;
       
       addClickToAnnotation();
+      addClickToSwitch();
     }
   });
 
@@ -262,6 +263,27 @@ function getCategoriesAndUpdateTree() {
 }
 
 /**
+ * Add icon for switching to tab
+ */
+function addClickToSwitch() {
+  $('div.node').each(function() {
+    if ($(this).attr('fake') == 'true' || $(this).attr('id') == 'root-node') {
+      return;
+    }
+    if ($(this).has('a.switch-to-tab').length > 0) {
+      return;
+    }
+    var switchToTab = $('<a/>', {'class': 'switch-to-tab', 'text': ' ⏩'});
+    var tabId = parseInt($(this).attr('id'));
+    switchToTab.click(function() {
+      chrome.tabs.update(tabId, {active: true});
+      return false;
+    });
+    $(this).append(switchToTab);
+  });
+}
+
+/**
  * Add markings to annotate tabs
  */
 function addClickToAnnotation() {  
@@ -272,11 +294,11 @@ function addClickToAnnotation() {
       return;
     }
 
-    if ($(this).has('a').length == 0) {
+    if ($(this).has('a.mark-toggle').length == 0) {
 
-      var mark = $('<a/>', {'class': 'mark',
-                        text: '★ '});
-      var unmark = $('<a/>', {'class': 'unmark',
+      var mark = $('<a/>', {'class': 'mark mark-toggle',
+                            text: '★ '});
+      var unmark = $('<a/>', {'class': 'unmark mark-toggle',
                               text: '★ '});         
       var tabID = parseInt($(this).attr('id'));
 
