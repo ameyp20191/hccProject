@@ -28,8 +28,19 @@ function isAncestorOf(nodeA, nodeB) {
     return false;
   }
 
+  var subdomainA = urlA.subdomain();
+  var subdomainB = urlB.subdomain();
+  // Check if subdomains are hierarchical
+  if (subdomainA !== subdomainB) {
+    if (subdomainB.indexOf(subdomainA) >= 0) {
+      return true;
+    }
+    return false;
+  }
+
   var pathA = urlA.path();
   var pathB = urlB.path();
+
   // If same paths, they are siblings
   if (pathA === pathB) {
     return false;
