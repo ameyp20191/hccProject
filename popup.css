@@ -39,7 +39,7 @@ a:hover {
     font-weight: italic;
 }
 
-button.tab-link {
+.tab-action-link {
     border: none;
     background-color: transparent;
     color: navy;
@@ -54,4 +54,14 @@ button.tab-link {
 
 .tab-link:hover {
     color: red;
+}
+
+#extension-links {
+    width: 100%;
+}
+
+#extension-links * {
+    width: 33%;
+    text-align: center;
+    display: inline-block;
 }
