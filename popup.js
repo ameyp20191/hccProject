@@ -1,33 +1,31 @@
 function showMarkAction(node) {
   // mark tabs
+  var markLink = $('<button/>', {id: 'mark', text: 'Mark', 'class': 'tab-action-link'}).appendTo(node);
+  var unmarkLink = $('<button/>', {id: 'unmark', text: 'Unmark', 'class': 'tab-action-link'}).appendTo(node);
   chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
     var background = chrome.extension.getBackgroundPage();
 
-    var markLink = $('<input/>', {id: 'mark', type: 'button', value: 'Mark'});
-    var markLinkDiv = $('<div/>').insertAfter(node).append(markLink);
     markLink.click(function() {
       markTab();
-      unmarkLinkDiv.show();
-      markLinkDiv.hide();
+      unmarkLink.show();
+      markLink.hide();
       updateMarkedTabsLinks();
     });
 
-    var unmarkLink = $('<input/>', {id: 'unmark', type: 'button', value: 'Unmark'});
-    var unmarkLinkDiv = $('<div/>').insertAfter(node).append(unmarkLink);
     unmarkLink.click(function() {
       unmarkTab();
-      markLinkDiv.show();
-      unmarkLinkDiv.hide();
+      markLink.show();
+      unmarkLink.hide();
       updateMarkedTabsLinks();
     });
 
     if (background.tabsMarked.indexOf(tabs[0].id) == -1) {
-      markLinkDiv.show();
-      unmarkLinkDiv.hide();
+      markLink.show();
+      unmarkLink.hide();
     }
     else {
-      unmarkLinkDiv.show();
-      markLinkDiv.hide();
+      unmarkLink.show();
+      markLink.hide();
     }
 
   });
@@ -102,8 +100,8 @@ function showMarkedTabsContent(content) {
     var tabId = tabsMarked[i];
     chrome.tabs.get(tabId, function(tab) {
       var tabLinkDiv = $('<div/>', {}).appendTo(content);
-      $('<a/>', {'class': 'tab-link', href: 'javascript:void(0)',
-                 text: tab.title, tabId: tab.id}).appendTo(tabLinkDiv);
+      $('<button/>', {'class': 'tab-action-link tab-switch-link',
+                      text: tab.title, tabId: tab.id}).appendTo(tabLinkDiv);
     });
   }
 }
@@ -123,10 +121,9 @@ $(document).ready(function() {
   });
 
   // Clicking a tab link switches to the tab
-  $('body').on('click', 'a.tab-link', function() {
+  $('body').on('click', 'button.tab-switch-link', function(event) {
     var tabId = parseInt($(this).attr('tabId'));
     chrome.tabs.update(tabId, {active: true}, function() {});
-    return false;
   });
 
   chrome.tabs.query(
@@ -145,9 +142,7 @@ $(document).ready(function() {
                                      text: tab.title}).appendTo("body");
       var tabUrlDiv = $('<div/>', {'class': 'current-tab-info url',
                                    text: tab.url}).appendTo("body");
-      var visualizeLinkDiv = $('<a/>', {id: 'visualize-link',
-                                        href: 'visualization/hypertree.html',
-                                        text: 'Visualization'}).appendTo('body');
+      var extensionLinksDiv = $('<div/>', {'id': 'extension-links'}).appendTo('body');
       var mostVisitedDiv = $('<div/>', {'class': 'links-div',
                                         id: 'most-visited'}).appendTo('body');
       var mostRecentDiv = $('<div/>', {'class': 'links-div',
@@ -155,7 +150,13 @@ $(document).ready(function() {
       var markedTabsDiv = $('<div/>', {'class': 'marked-tabs-div',
                                        id: 'marked-tabs'}).appendTo('body');
 
-      showMarkAction(tabUrlDiv);
+      showMarkAction(extensionLinksDiv);
+      var visualizeLink = $('<a/>', {id: 'visualize-link',
+                                     href: 'visualization/hypertree.html',
+                                     text: 'Visualization'}).appendTo(extensionLinksDiv);
+      var helpLink = $('<a/>', {id: 'help-link',
+                                href: 'help.html', text: 'Help'}).appendTo(extensionLinksDiv);
+
       showMostVisitedUrls(tabDomain.valueOf(), oneMonthAgo, maxUrls, mostVisitedDiv);
       showMostRecentUrls(tabDomain.valueOf(), maxUrls, mostRecentDiv);
       showMarkedTabs(markedTabsDiv);

@@ -28,8 +28,19 @@ function isAncestorOf(nodeA, nodeB) {
     return false;
   }
 
+  var subdomainA = urlA.subdomain();
+  var subdomainB = urlB.subdomain();
+  // Check if subdomains are hierarchical
+  if (subdomainA !== subdomainB) {
+    if (subdomainB.indexOf(subdomainA) >= 0) {
+      return true;
+    }
+    return false;
+  }
+
   var pathA = urlA.path();
   var pathB = urlB.path();
+
   // If same paths, they are siblings
   if (pathA === pathB) {
     return false;
@@ -104,6 +115,7 @@ function createFakeNode(url) {
   node.name = uri.domain();
   node.data.title = uri.domain();
   node.data.url = url;
+  node.data.domainNode = true;
   node.data.fake = true;
   return node;
 }
@@ -121,10 +133,9 @@ function tabsToTreeByUrl(params) {
   }
   var tree = {};
   var fakeDomainsAdded = {};
-
   var rootNode = {"id": "root-node",
-                  "name": "Root",
-                  "data": {url: "/"},
+                  "name": "Current window",
+                  "data": {url: "/", title: "Current window"},
                   "children": []
                  };
   for (var i=0; i<tabs.length; i++) {

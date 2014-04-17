@@ -1,0 +1,40 @@
+{
+    "manifest_version": 2,
+
+    "name": "EasyNavigator",
+    "description": "Browsing made more efficient.",
+    "version": "0.1",
+    "commands": {
+         "launch-visualization": {
+             "suggested_key": {
+                 "default": "Ctrl+Shift+V"
+             },
+             "description": "Launch the tabs visualization."
+         },
+         "toggle-mark-tab": {
+             "suggested_key": {
+                 "default": "Ctrl+Period"
+             },
+             "description": "Mark or unmark the current tab."
+         },
+         "_execute_browser_action": {
+             "suggested_key": {
+                 "default": "Ctrl+Comma"
+             },
+             "description": "Show quick-links."
+         }
+     },
+    "background": {
+        "scripts": ["thirdparty/URI.js","backgroundPage.js"],
+        "persistent": true
+    },
+    "permissions": [
+        "<all_urls>",
+        "history",
+        "tabs"
+    ],
+    "browser_action": {
+        "default_icon": "icon.png",
+        "default_popup": "popup.html"
+    }
+}

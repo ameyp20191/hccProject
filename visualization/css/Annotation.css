@@ -1,0 +1,14 @@
+.node a.unmark
+{
+  color: #616161;
+}
+
+.node a.mark
+{
+  color: #ffd700;
+}
+
+.node a:hover
+{
+  font-size: 19px;
+}

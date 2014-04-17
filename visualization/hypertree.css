@@ -1,0 +1,38 @@
+#infovis-canvaswidget {
+   margin:25px 0 0 25px;
+}
+
+.tip {
+    min-width: 200px;
+}
+
+
+ul#group-by-list {
+    list-style: none;
+    padding-left: 10px;
+}
+
+
+a:hover {
+    color: red;
+}
+
+a.node-link {
+    color: steelblue;
+}
+
+a.node-link:hover {
+    color: red;
+}
+
+a.switch-to-tab {
+    color: darkgreen;
+}
+
+a.switch-to-tab:hover {
+    color: red;
+}
+
+.get-missing-categories {
+    display: none;
+}
