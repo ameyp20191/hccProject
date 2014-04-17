@@ -1,4 +1,4 @@
-easynavigator
+EasyNavigator
 =============
 
 EasyNavigator is a Chrome extension for making web browsing more
