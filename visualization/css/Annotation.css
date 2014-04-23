@@ -1,14 +1,19 @@
-.node a.unmark
+a.unmark
 {
   color: #616161;
 }
 
-.node a.mark
+a.mark
 {
   color: #ffd700;
 }
 
-.node a:hover
+a.unmark:hover
+{
+  font-size: 19px;
+}
+
+a.mark:hover
 {
   font-size: 19px;
 }

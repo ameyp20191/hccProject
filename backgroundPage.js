@@ -25,6 +25,41 @@ chrome.commands.onCommand.addListener(function(command) {
       }
     });
   }
+  else if (command === "switch-mark-tab") {
+    //alert('hotkey');
+    chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
+      var currentTabId = tabs[0].id;
+      
+      chrome.tabs.getAllInWindow(null, function(tabs) {      
+        var index = -1;
+        
+        for (var i = 0; i < tabs.length; ++i) {
+          if (tabs[i].id == currentTabId) {
+            index = i;
+            break;
+          }
+        }
+        if (index == -1)
+          return;
+        
+        var next = (index + 1) % tabs.length;
+        
+        // find the next marked tab
+        if (tabsMarked.length > 0) {
+          while (next != index) {
+            if (tabsMarked.indexOf(tabs[next].id) >= 0)
+              break;
+            next = (next + 1) % tabs.length;
+          }
+        }
+        
+        // switch to the next tab
+        console.log('switch to ' + next);
+        chrome.tabs.update(tabs[next].id, {active: true});
+      });
+      
+    });
+  }
 });
 
 /**

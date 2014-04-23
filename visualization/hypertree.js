@@ -171,13 +171,14 @@ function init(groupBy){
           }
           else {
             html += "<li><a href='javascript:void(0)' class='tab-link' " +
-              "tab-id='" + child.id + "'>" + child.data.title + "</a></li>";
+              "tab-id='" + child.id + "'>" + child.data.title + "</a></li>";             
           }
         }
       });
       html += "</ul>";
       $jit.id('inner-details').innerHTML = html;
       
+      addClickToAnnotationPanel();
       addClickToAnnotation();
       addClickToSwitch();
     }
@@ -185,6 +186,71 @@ function init(groupBy){
 
   displayTree(groupBy);
 }
+
+/**
+ * Add markings to annotate tabs
+ */
+function addClickToAnnotationPanel() {  
+  
+  $('a.tab-link').each(function() {
+
+    var mark = $('<a/>', {'class': 'mark mark-toggle',
+                          text: '★ '});
+    var unmark = $('<a/>', {'class': 'unmark mark-toggle',
+                            text: '★ '});         
+    var tabID = parseInt($(this).attr('tab-id'));
+
+    mark.click(function() {
+      mark.hide();
+      unmark.show();        
+      chrome.runtime.sendMessage({action: "unmarkTab", tabId: tabID});      
+      
+      //alert('unmark: ' + $(this).text());
+      
+      // click on the tree
+      $('div.node').each(function() {
+        if ($(this).attr('tab-id') != tabID)
+          return;        
+        $(this).children('.mark').hide();  
+        $(this).children('.unmark').show();
+      });
+      
+      return false;           // Prevents node from centering
+    });
+    
+    unmark.click(function() {
+      event.preventDefault();
+      unmark.hide();
+      mark.show();        
+      chrome.runtime.sendMessage({action: "markTab", tabId: tabID});    
+
+      //alert('mark: ' + $(this).text());    
+      
+      // click on the tree
+      $('div.node').each(function() {
+        if ($(this).attr('tab-id') != tabID)
+          return;
+        $(this).children('.unmark').hide();  
+        $(this).children('.mark').show();        
+      });
+      
+      return false;           // Prevents node from centering
+    });
+      
+    if ($(this).text().indexOf('★ ') == 0) {      
+      $(this).html($(this).text().substr(2));
+      $(this).prepend(mark);
+      $(this).prepend(unmark);        
+      unmark.hide();
+    }
+    else {
+      $(this).prepend(mark);
+      $(this).prepend(unmark);
+      mark.hide();
+    }
+  });
+}
+
 
 function displayTree(groupBy) {
   chrome.tabs.query({}, function(tabs) {
@@ -283,6 +349,7 @@ function addClickToSwitch() {
   });
 }
 
+
 /**
  * Add markings to annotate tabs
  */
@@ -306,6 +373,17 @@ function addClickToAnnotation() {
         mark.hide();
         unmark.show();        
         chrome.runtime.sendMessage({action: "unmarkTab", tabId: tabID});
+        
+        // click on the right panel
+        $('li .tab-link').each(function() {
+          if ($(this).attr('tab-id') != tabID)
+            return;
+          //alert('unmark: ' + $(this).text());
+          //$(this).children('.mark').trigger('click');
+          $(this).children('.mark').hide();
+          $(this).children('.unmark').show();  
+        });
+        
         return false;           // Prevents node from centering
       });
       
@@ -313,7 +391,18 @@ function addClickToAnnotation() {
         event.preventDefault();
         unmark.hide();
         mark.show();        
-        chrome.runtime.sendMessage({action: "markTab", tabId: tabID});
+        chrome.runtime.sendMessage({action: "markTab", tabId: tabID});                
+        
+        // click on the right panel
+        $('li .tab-link').each(function() {
+          if ($(this).attr('tab-id') != tabID)
+            return;
+          //alert('mark: ' + $(this).text());
+          //$(this).children('.unmark').trigger('click');
+          $(this).children('.unmark').hide();
+          $(this).children('.mark').show();          
+        });
+        
         return false;           // Prevents node from centering
       });
         

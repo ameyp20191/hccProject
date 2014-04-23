@@ -22,6 +22,12 @@
                  "default": "Ctrl+Comma"
              },
              "description": "Show quick-links."
+         },
+         "switch-mark-tab": {
+             "suggested_key": {
+                 "default": "Ctrl+Right"
+             },
+             "description": "Switch between marked tabs."
          }
      },
     "background": {
