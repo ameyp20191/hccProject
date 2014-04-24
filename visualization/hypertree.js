@@ -74,6 +74,7 @@ function init(groupBy){
       offsetX: 10,
       offsetY: 10,
       onShow: function(tip, node) {
+        tip.innerHTML = '';
         if (node.data.domainNode) {
           tip.innerHTML = '<b>' + node.data.title + '</b> <br/>';
           tip.innerHTML += 'Domain: ' + node.data.title + '<br/>';
@@ -85,8 +86,13 @@ function init(groupBy){
           tip.innerHTML = '<b>' + node.data.title + '</b> <br/>' + node.data.url + '<br/>';
         }
         var img = getTabImage(node.id); // add preview under the url
-        if( img )
-            tip.appendChild(img);
+        if( img ) {
+          tip.className = 'tip with-preview';
+          tip.appendChild(img);
+        }
+        else {
+          tip.className = 'tip';
+        }
       }
     },
     //id of the visualization container
@@ -427,10 +433,8 @@ function getTabImage(tabID) {
     var img = document.createElement('img');
     if (retrievedData === undefined || retrievedData === null)
         return null;
+    img.className = 'preview';
     img.src = retrievedData;
-        img.style.maxWidth = '180px';
-        img.border = '2px';
-
     return img;
 }
 

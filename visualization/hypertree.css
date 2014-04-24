@@ -3,9 +3,17 @@
 }
 
 .tip {
-    min-width: 200px;
+    width: 200px;
 }
 
+.tip.with-preview {
+    width: 500px;
+}
+
+img.preview {
+    max-width: 100%;
+    border: 2px;
+}
 
 ul#group-by-list {
     list-style: none;
