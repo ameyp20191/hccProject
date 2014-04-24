@@ -18,10 +18,10 @@ chrome.commands.onCommand.addListener(function(command) {
       var tabId = tabs[0].id;
       if (tabsMarked.indexOf(tabId) >= 0) {
         // tab is marked, unmark it
-        chrome.runtime.sendMessage({action: "unmarkTab", tabId: tabId});
+        unmarkTab(tabId);
       }
       else {
-        chrome.runtime.sendMessage({action: "markTab", tabId: tabId});
+        markTab(tabId);
       }
     });
   }
