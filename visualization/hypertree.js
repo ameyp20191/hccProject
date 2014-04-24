@@ -203,10 +203,8 @@ function addClickToAnnotationPanel() {
     mark.click(function() {
       mark.hide();
       unmark.show();        
-      chrome.runtime.sendMessage({action: "unmarkTab", tabId: tabID});      
-      
-      //alert('unmark: ' + $(this).text());
-      
+      chrome.extension.getBackgroundPage().unmarkTab(tabID);
+
       // click on the tree
       $('div.node').each(function() {
         if ($(this).attr('tab-id') != tabID)
@@ -222,9 +220,7 @@ function addClickToAnnotationPanel() {
       event.preventDefault();
       unmark.hide();
       mark.show();        
-      chrome.runtime.sendMessage({action: "markTab", tabId: tabID});    
-
-      //alert('mark: ' + $(this).text());    
+      chrome.extension.getBackgroundPage().markTab(tabID);
       
       // click on the tree
       $('div.node').each(function() {
@@ -372,7 +368,7 @@ function addClickToAnnotation() {
       mark.click(function() {
         mark.hide();
         unmark.show();        
-        chrome.runtime.sendMessage({action: "unmarkTab", tabId: tabID});
+        chrome.extension.getBackgroundPage().unmarkTab(tabID);
         
         // click on the right panel
         $('li .tab-link').each(function() {
@@ -391,7 +387,7 @@ function addClickToAnnotation() {
         event.preventDefault();
         unmark.hide();
         mark.show();        
-        chrome.runtime.sendMessage({action: "markTab", tabId: tabID});                
+        chrome.extension.getBackgroundPage().markTab(tabID);
         
         // click on the right panel
         $('li .tab-link').each(function() {

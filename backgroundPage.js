@@ -100,25 +100,34 @@ chrome.windows.onRemoved.addListener(function (windowId) {
 
 
 /**
- * Listen to message for tab marking
+ * Mark a tab.
+ * @param {number/String} tabId - Tab ID
+ * @param {function} callback - Optional callback
  */
-chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {    
-    if (msg.action && msg.action == "markTab" && msg.tabId) {
-        console.log(msg.tabId);                
-        if (tabsMarked.indexOf(msg.tabId) == -1) {
-            tabsMarked.push(msg.tabId);
-            chrome.tabs.executeScript(parseInt(msg.tabId), {code: "if (document.title.indexOf('★ ') == -1) document.title = '★ ' + document.title"});
-        }
-    }
-    else if (msg.action && msg.action == "unmarkTab" && msg.tabId) {
-        console.log(msg.tabId);        
-        var index = tabsMarked.indexOf(msg.tabId);
-        if (index > -1) {
-            tabsMarked.splice(index, 1);
-            chrome.tabs.executeScript(parseInt(msg.tabId), {code: "if (document.title.indexOf('★ ') == 0) document.title = document.title.substr(2)"});
-        }
-    }
-});
+function markTab(tabId, callback) {
+  var markScript = "if (document.title.indexOf('★ ') == -1) " +
+        "document.title = '★ ' + document.title";
+  if (tabsMarked.indexOf(tabId) == -1) {
+    tabsMarked.push(tabId);
+    chrome.tabs.executeScript(parseInt(tabId), {code: markScript}, callback);
+  }
+}
+
+/**
+ * Unmark a tab.
+ * @param {number/String} tabId - Tab ID
+ * @param {function} callback - Optional callback
+ */
+function unmarkTab(tabId, callback) {
+  var unmarkScript = "if (document.title.indexOf('★ ') == 0) " +
+        "document.title = document.title.substr(2)";
+  var index = tabsMarked.indexOf(tabId);
+  if (index > -1) {
+    tabsMarked.splice(index, 1);
+    chrome.tabs.executeScript(parseInt(tabId), {code: unmarkScript}, callback);
+  }
+}
+
 
 /**
  * Listen to tab updating
