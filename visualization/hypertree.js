@@ -56,7 +56,17 @@ function init(groupBy){
         img.src = node.data.favIconUrl;
         var pos = node.getPos().getc();
         var scale = node.scale;
-        ctx.drawImage(img, pos.x * scale, pos.y * scale, 20, 20);
+        var imgWidth = 20;
+        var imgHeight = 20;
+        node.data.imgWidth = imgWidth;
+        node.data.imgHeight = imgHeight;
+        ctx.drawImage(img, pos.x * scale, pos.y * scale, imgWidth, imgHeight);
+      },
+      'contains': function(node, pos) {
+        var npos = node.pos.getc().$scale(node.scale);
+        var width = node.data.imgWidth;
+        var height = node.data.imgHeight;
+        return this.nodeHelper.square.contains(npos, pos, width, height);
       }
     }
   });
