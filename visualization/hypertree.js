@@ -74,6 +74,7 @@ function loadFavIcons() {
 }
 
 var ht;
+var panelTree;
 function init(groupBy){
   $jit.Hypertree.Plot.NodeTypes.implement({
     'image': {
@@ -202,31 +203,6 @@ function init(groupBy){
     },
 
     onComplete: function(){
-      //Log.write("done");
-      Log.write(" ");
-
-      //Build the right column relations list.
-      //This is done by collecting the information (stored in the data property)
-      //for all the nodes adjacent to the centered node.
-      var node = ht.graph.getClosestNodeToOrigin("current");
-      var html = "<h4>" + node.name + "</h4><b>Connections:</b>";
-      html += "<ul>";
-      node.eachAdjacency(function(adj){
-        var child = adj.nodeTo;
-        if (child.data) {
-          if (child.data.fake || child.id == 'root-node') {
-            html += "<li><a href='javascript:void(0)' class='node-link' " +
-              "node-id='" + child.id + "'>" + child.data.title + "</a></li>";
-          }
-          else {
-            html += "<li><a href='javascript:void(0)' class='tab-link' " +
-              "tab-id='" + child.id + "'>" + child.data.title + "</a></li>";             
-          }
-        }
-      });
-      html += "</ul>";
-      $jit.id('inner-details').innerHTML = html;
-      
       addClickToAnnotationPanel();
       addClickToAnnotation();
       addClickToSwitch();
@@ -326,8 +302,11 @@ function displayTree(groupBy) {
     ht.refresh();
     // End
     ht.controller.onComplete();
+
+    showTreeInPanel(json);
   });
 }
+
 
 /* Show the missing categories button if and only if there are tabs
  * for which categories have not been fetched.
@@ -370,6 +349,7 @@ function getCategoriesAndUpdateTree() {
         hideLabels: false,
         transition: $jit.Trans.Quart.easeOut
       });
+      showTreeInPanel(newJson);
       setMissingCategoriesDivState();
     });
   });
