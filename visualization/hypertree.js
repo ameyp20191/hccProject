@@ -379,7 +379,7 @@ function addClickToSwitch() {
     if ($(this).has('a.switch-to-tab').length > 0) {
       return;
     }
-    var switchToTab = $('<a/>', {'class': 'switch-to-tab', 'text': ' ⏩'});
+    var switchToTab = $('<a/>', {'class': 'switch-to-tab', 'text': ' ▶'});
     var tabId = parseInt($(this).attr('id'));
     switchToTab.click(function() {
       chrome.tabs.update(tabId, {active: true});
