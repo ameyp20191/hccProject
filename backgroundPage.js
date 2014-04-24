@@ -11,7 +11,15 @@ var groupBy = 'url';            // Default tree grouping criterion
  */
 chrome.commands.onCommand.addListener(function(command) {
   if (command === "launch-visualization") {
-    chrome.tabs.create({url: "visualization/hypertree.html"});
+    chrome.tabs.query({title: "Visualize tabs"}, function(tabs) {
+      if (tabs.length == 0) {
+        chrome.tabs.create({url: "visualization/hypertree.html"});
+      }
+      else {
+        // If a visualization tab is already open, switch to it
+        chrome.tabs.update(tabs[0].id, {active: true});
+      }
+    });
   }
   else if (command === "toggle-mark-tab") {
     chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
