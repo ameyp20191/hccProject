@@ -46,12 +46,34 @@ function showMostVisitedUrls(searchText, startTime, maxUrls, node) {
 
     for (var i=0; i<results.length && i<maxUrls; i++) {
       var r = results[i];
-      $('<a/>', {href: r.url, text: r.url}).appendTo(content);
+      var text = r.url;
+      if (r.title) {
+        text = r.title;
+      }
+      var link = $('<a/>', {href: r.url, text: text}).appendTo(content);
+
+      var urlPopdownDiv = $('<div/>', {'class': 'url-popdown'}).appendTo(content);
+      var urlPopdownAnchor = $('<span/>', {text: r.url}).appendTo(urlPopdownDiv);
+      urlPopdownDiv.hide();
+
+      link.data('urlPopdownDiv', urlPopdownDiv);
+      link.hover(function() { $(this).data('urlPopdownDiv').show(); }, 
+                 function() { $(this).data('urlPopdownDiv').hide(); });
+
       $('<div/>', {'class': 'url-info', text: 'Count: ' + r.visitCount}).appendTo(content);
     }
   });
 }
 
+
+function showUrlBelow() {
+  var urlPopdownDiv = $(this).append($('<div/>', {'class': 'url-popdown'})).appendTo($(this));
+  $('<a/>', {href: $(this).attr('href'), text: $(this).attr('href')}).appendTo(urlPopdownDiv);
+}
+
+function hideUrlBelow() {
+  $(this).children('.url-popdown').empty();
+}
 
 /**
  * Show a list of the most recently visited URLs containing a search term.
@@ -69,7 +91,20 @@ function showMostRecentUrls(searchText, maxUrls, node) {
 
     for (var i=0; i<results.length && i<maxUrls; i++) {
       var r = results[i];
-      $('<a/>', {href: r.url, text: r.url}).appendTo(content);
+      var text = r.url;
+      if (r.title) {
+        text = r.title;
+      }
+      var link = $('<a/>', {href: r.url, text: text}).appendTo(content);
+
+      var urlPopdownDiv = $('<div/>', {'class': 'url-popdown'}).appendTo(content);
+      var urlPopdownAnchor = $('<span/>', {text: r.url}).appendTo(urlPopdownDiv);
+      urlPopdownDiv.hide();
+
+      link.data('urlPopdownDiv', urlPopdownDiv);
+      link.hover(function() { $(this).data('urlPopdownDiv').show(); }, 
+                 function() { $(this).data('urlPopdownDiv').hide(); });
+
       $('<div/>', {'class': 'url-info',
                    text: 'Last visit: ' + moment(r.lastVisitTime).format('llll')}).appendTo(content);
     }

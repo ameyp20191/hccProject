@@ -13,19 +13,19 @@
          },
          "toggle-mark-tab": {
              "suggested_key": {
-                 "default": "Ctrl+Period"
+                 "default": "Ctrl+Shift+S"
              },
              "description": "Mark or unmark the current tab."
          },
          "_execute_browser_action": {
              "suggested_key": {
-                 "default": "Ctrl+Comma"
+                 "default": "Ctrl+Shift+X"
              },
              "description": "Show quick-links."
          },
          "switch-mark-tab": {
              "suggested_key": {
-                 "default": "Ctrl+Right"
+                 "default": "Ctrl+Shift+Z"
              },
              "description": "Switch between marked tabs."
          }
