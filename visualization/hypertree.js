@@ -39,6 +39,10 @@ function tabToNode(tab) {
 
   node.data.title = tab.title;
   node.data.url = tab.url;
+  if (tab.favIconUrl) {
+    node.data.favIconUrl = tab.favIconUrl;
+    node.data["$type"] = "image";
+  }
   return node;
 }
 
@@ -48,7 +52,8 @@ function init(groupBy){
     'image': {
       'render': function(node, canvas) {
         var ctx = canvas.getCtx();
-        var img = document.getElementById("my-icon");
+        var img = document.createElement('img');
+        img.src = node.data.favIconUrl;
         var pos = node.getPos().getc();
         var scale = node.scale;
         ctx.drawImage(img, pos.x * scale, pos.y * scale, 20, 20);
