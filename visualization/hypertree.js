@@ -39,11 +39,38 @@ function tabToNode(tab) {
 
   node.data.title = tab.title;
   node.data.url = tab.url;
-  if (tab.favIconUrl) {
-    node.data.favIconUrl = tab.favIconUrl;
-    node.data["$type"] = "image";
+  // Check if favicon can be displayed
+  var uri = new URI(tab.url);
+  // Local resources cannot be accessed if permissions have not been granted
+  if (uri.protocol() !== "chrome" && uri.protocol() !== "file") {
+    if (tab.favIconUrl) {
+      node.data.favIconUrl = tab.favIconUrl;
+      node.data["$type"] = "image";
+    }
   }
   return node;
+}
+
+
+/**
+ * Load favicons for each tab.
+ *
+ * Creates an image element for each node, loads the favicon, and once
+ * loaded, replots the node to make the icon visible.
+ *
+ * See question 7287285 on Stack Overflow.
+ */
+function loadFavIcons() {
+  ht.graph.eachNode(function(node) {
+    if (node.getData('type') === 'image') {
+      var img = new Image();
+      img.addEventListener('load', function() {
+        node.setData('image', img);
+        ht.fx.plotNode(node, ht.canvas);
+      }, false);
+      img.src = node.data.favIconUrl;
+    }
+  });
 }
 
 var ht;
@@ -52,15 +79,17 @@ function init(groupBy){
     'image': {
       'render': function(node, canvas) {
         var ctx = canvas.getCtx();
-        var img = document.createElement('img');
-        img.src = node.data.favIconUrl;
         var pos = node.getPos().getc();
         var scale = node.scale;
         var imgWidth = 20;
         var imgHeight = 20;
         node.data.imgWidth = imgWidth;
         node.data.imgHeight = imgHeight;
-        ctx.drawImage(img, pos.x * scale, pos.y * scale, imgWidth, imgHeight);
+
+        if (node.getData('image')) {
+          var img = node.getData('image');
+          ctx.drawImage(img, pos.x * scale, pos.y * scale, imgWidth, imgHeight);
+        }
       },
       'contains': function(node, pos) {
         var npos = node.pos.getc().$scale(node.scale);
@@ -133,9 +162,8 @@ function init(groupBy){
         node.data.$color = "#922";
       }
     },
-    //Attach event handlers and add text to the
-    //labels. This method is only triggered on label
-    //creation
+    // Attach event handlers and add text to the labels. This method is
+    // only triggered on label creation
     onCreateLabel: function(domElement, node){
       domElement.innerHTML = node.name;
       domElement.setAttribute("tab-id", node.id);
@@ -151,7 +179,7 @@ function init(groupBy){
         });
       });
     },
-    //Change node styles when labels are placed or moved.
+    // Change node styles when labels are placed or moved.
     onPlaceLabel: function(domElement, node){
       var style = domElement.style;
       style.display = '';
@@ -290,11 +318,13 @@ function displayTree(groupBy) {
       json = tabsToTreeBySequence(tabs);
     }
 
-    //load JSON data.
+    // Load JSON data.
     ht.loadJSON(json);
-    //compute positions and plot.
+    // Load favicons.
+    loadFavIcons();
+    // Compute positions and plot.
     ht.refresh();
-    //end
+    // End
     ht.controller.onComplete();
   });
 }
