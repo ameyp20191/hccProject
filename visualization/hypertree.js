@@ -30,13 +30,7 @@ var Log = {
 function tabToNode(tab) {
   var node = {"data": {}, "children": []};
   node.id = tab.id.toString();
-  if (tab.title.length > 21) {
-    node.name = tab.title.substring(0, 18) + '..';
-  }
-  else {
-    node.name = tab.title;
-  }
-
+  node.name = shortenText(tab.title);
   node.data.title = tab.title;
   node.data.url = tab.url;
   // Check if favicon can be displayed
@@ -45,9 +39,15 @@ function tabToNode(tab) {
   if (uri.protocol() !== "chrome" && uri.protocol() !== "file") {
     if (tab.favIconUrl) {
       node.data.favIconUrl = tab.favIconUrl;
-      node.data["$type"] = "image";
+    }
+    else {
+      node.data.favIconUrl = "default_favicon.png";
     }
   }
+  else {
+    node.data.favIconUrl = "default_favicon.png";
+  }
+  node.data["$type"] = "image";
   return node;
 }
 
@@ -89,7 +89,10 @@ function init(groupBy){
 
         if (node.getData('image')) {
           var img = node.getData('image');
-          ctx.drawImage(img, pos.x * scale, pos.y * scale, imgWidth, imgHeight);
+          ctx.drawImage(
+            img,
+            pos.x * scale - (imgWidth / 2), pos.y * scale - (imgHeight / 2), 
+            imgWidth, imgHeight);
         }
       },
       'contains': function(node, pos) {
@@ -140,12 +143,12 @@ function init(groupBy){
         }
       }
     },
-    //id of the visualization container
+    // ID of the visualization container
     injectInto: 'infovis',
-    //canvas width and height
+    // Canvas width and height
     width: w,
     height: h,
-    //Change node and edge styles such as color, width and dimensions.
+    // Change node and edge styles such as color, width and dimensions.
     Node: {
       overridable: true,
       dim: 9,
@@ -153,10 +156,12 @@ function init(groupBy){
     },
     Edge: {
       lineWidth: 2,
-      color: "#088"
+      //color: "#088"
+      //color: "rgb(157, 209, 50)"
+      color: "rgb(177, 220, 90)"
     },
-    onBeforeCompute: function(node){
-      Log.write("centering");
+    onBeforeCompute: function(node) { 
+      Log.write("Centering...");
     },
     onBeforePlotNode: function(node) {
       if (node.data.fake) {
@@ -169,6 +174,7 @@ function init(groupBy){
       domElement.innerHTML = node.name;
       domElement.setAttribute("tab-id", node.id);
       if (node.data.fake) {
+        $(domElement).addClass('fake');
         domElement.setAttribute("fake", "true");
       }
       
@@ -185,24 +191,29 @@ function init(groupBy){
       var style = domElement.style;
       style.display = '';
       style.cursor = 'pointer';
-      if (node._depth <= 1) {
-        style.fontSize = "0.8em";
-        style.color = "#ddd";
+      $(domElement).attr('depth', node._depth);
+      // if (node._depth <= 1) {
+      //   style.fontSize = "0.8em";
+      //   style.color = "#ddd";
+      //   style.color = "black";
 
-      } else if(node._depth == 2){
-        style.fontSize = "0.7em";
-        style.color = "#555";
+      // } else if(node._depth == 2){
+      //   style.fontSize = "0.7em";
+      //   style.color = "#555";
 
-      } else {
-        style.display = 'none';
-      }
+      // } else {
+      //   style.display = 'none';
+      // }
 
       var left = parseInt(style.left);
+      var top = parseInt(style.top);
       var w = domElement.offsetWidth;
       style.left = (left - w / 2) + 'px';
+      style.top = (top + 10) + 'px';
     },
 
     onComplete: function(){
+      Log.write("");
       addClickToAnnotationPanel();
       addClickToAnnotation();
       addClickToSwitch();
@@ -336,6 +347,7 @@ function setMissingCategoriesDivState() {
   });
 }
 
+
 /**
  * Get categories for the necessary tabs and redraw the tree.
  */
@@ -354,6 +366,7 @@ function getCategoriesAndUpdateTree() {
     });
   });
 }
+
 
 /**
  * Add icon for switching to tab

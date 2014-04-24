@@ -112,7 +112,7 @@ function createFakeNode(url) {
   var node = {"data": {}, "children": []};
   node.id = url;                // If ID is randomized, the node positions are unpredictable
   var uri = new URI(url);
-  node.name = uri.domain();
+  node.name = shortenText(uri.domain());
   node.data.title = uri.domain();
   node.data.url = url;
   node.data.domainNode = true;

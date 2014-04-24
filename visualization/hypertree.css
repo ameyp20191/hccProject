@@ -2,8 +2,22 @@
    margin:25px 0 0 25px;
 }
 
+
+/*TOOLTIPS*/
 .tip {
+    color: #111;
     width: 200px;
+    background-color: white;
+    border:1px solid #ccc;
+    -moz-box-shadow:#555 2px 2px 8px;
+    -webkit-box-shadow:#555 2px 2px 8px;
+    -o-box-shadow:#555 2px 2px 8px;
+    box-shadow:#555 2px 2px 8px;
+    opacity:0.9;
+    filter:alpha(opacity=90);
+    font-size:10px;
+    font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
+    padding:7px;
 }
 
 .tip.with-preview {
@@ -43,4 +57,27 @@ a.switch-to-tab:hover {
 
 .get-missing-categories {
     display: none;
+}
+
+.node.fake {
+    background-color: "999999";
+}
+
+.node {
+    background-color: white;
+}
+
+.node[depth="0"], .node[depth="1"] {
+    color: black;
+    font-size: 0.9em;
+}
+
+.node[depth="2"] {
+    color: rgb(47, 79, 79);
+    font-size: 0.8em;
+}
+
+/* Nodes with depth > 2 */
+.node[depth="3"] {
+    font-size: 0.6em;
 }
