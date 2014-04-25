@@ -27,31 +27,6 @@ var Log = {
 };
 
 
-function tabToNode(tab) {
-  var node = {"data": {}, "children": []};
-  node.id = tab.id.toString();
-  node.name = shortenText(tab.title);
-  node.data.title = tab.title;
-  node.data.url = tab.url;
-  // Check if favicon can be displayed
-  var uri = new URI(tab.url);
-  // Local resources cannot be accessed if permissions have not been granted
-  if (uri.protocol() !== "chrome" && uri.protocol() !== "file") {
-    if (tab.favIconUrl) {
-      node.data.favIconUrl = tab.favIconUrl;
-    }
-    else {
-      node.data.favIconUrl = "default_favicon.png";
-    }
-  }
-  else {
-    node.data.favIconUrl = "default_favicon.png";
-  }
-  node.data["$type"] = "image";
-  return node;
-}
-
-
 /**
  * Load favicons for each tab.
  *
@@ -82,23 +57,29 @@ function init(groupBy){
         var ctx = canvas.getCtx();
         var pos = node.getPos().getc();
         var scale = node.scale;
-        var imgWidth = 20;
-        var imgHeight = 20;
-        node.data.imgWidth = imgWidth;
-        node.data.imgHeight = imgHeight;
 
         if (node.getData('image')) {
           var img = node.getData('image');
-          ctx.drawImage(
-            img,
-            pos.x * scale - (imgWidth / 2), pos.y * scale - (imgHeight / 2), 
-            imgWidth, imgHeight);
+
+          var width = node.getData('dim');
+          var height = node.getData('dim');
+          node.data.imgWidth = width;
+          node.data.imgHeight = height;
+
+          // x and y so that the image is centered
+          var xPos = pos.x * scale - (width / 2);
+          var yPos = pos.y * scale - (height / 2);
+
+          ctx.drawImage(img, xPos, yPos, width, height);
         }
       },
+
       'contains': function(node, pos) {
         var npos = node.pos.getc().$scale(node.scale);
+
         var width = node.data.imgWidth;
         var height = node.data.imgHeight;
+
         return this.nodeHelper.square.contains(npos, pos, width, height);
       }
     }
@@ -107,15 +88,33 @@ function init(groupBy){
   var infovis = document.getElementById('infovis');
   infovis.innerHTML = '';
   var w = infovis.offsetWidth - 50, h = infovis.offsetHeight - 50;
-  //var w = 1280, h = 1024;
-  //init Hypertree
   ht = new $jit.Hypertree({
     duration: 1000,
     Navigation: {
       enable: true,
-      panning: true,
-      zooming: true
+      panning: false,
+      zooming: false
     },
+
+    Events: {
+      enable: true,
+      onClick: function(node, eventInfo, e) {
+        if (eventInfo.node) {
+          console.log('node name = ', eventInfo.node.name);
+        }
+      }
+    },
+
+    NodeStyles: {
+      enable: true,
+      type: 'Native',
+      stylesHover: {
+        dim: 30,
+        color: '#fcc'
+      },
+      duration: 600
+    },
+
     Tips: {
       enable: true,
       type: 'Native',
@@ -143,31 +142,38 @@ function init(groupBy){
         }
       }
     },
+
     // ID of the visualization container
     injectInto: 'infovis',
+
     // Canvas width and height
     width: w,
     height: h,
+
     // Change node and edge styles such as color, width and dimensions.
     Node: {
       overridable: true,
       dim: 9,
       color: "#f00"
     },
+
     Edge: {
       lineWidth: 2,
       //color: "#088"
       //color: "rgb(157, 209, 50)"
       color: "rgb(177, 220, 90)"
     },
+
     onBeforeCompute: function(node) { 
       Log.write("Centering...");
     },
+
     onBeforePlotNode: function(node) {
       if (node.data.fake) {
         node.data.$color = "#922";
       }
     },
+
     // Attach event handlers and add text to the labels. This method is
     // only triggered on label creation
     onCreateLabel: function(domElement, node){
@@ -186,25 +192,12 @@ function init(groupBy){
         });
       });
     },
+
     // Change node styles when labels are placed or moved.
     onPlaceLabel: function(domElement, node){
-      var style = domElement.style;
-      style.display = '';
-      style.cursor = 'pointer';
       $(domElement).attr('depth', node._depth);
-      // if (node._depth <= 1) {
-      //   style.fontSize = "0.8em";
-      //   style.color = "#ddd";
-      //   style.color = "black";
 
-      // } else if(node._depth == 2){
-      //   style.fontSize = "0.7em";
-      //   style.color = "#555";
-
-      // } else {
-      //   style.display = 'none';
-      // }
-
+      var style = domElement.style;
       var left = parseInt(style.left);
       var top = parseInt(style.top);
       var w = domElement.offsetWidth;
@@ -460,22 +453,6 @@ function addClickToAnnotation() {
     }
   });
 }
-
-/*
-* Get the preview of required Tab from localStorage
-* @param {tabID} id of required tab
-* @returns {img} html element for the preview of required tab
-*/
-function getTabImage(tabID) {
-    var retrievedData = localStorage.getItem(tabID);
-    var img = document.createElement('img');
-    if (retrievedData === undefined || retrievedData === null)
-        return null;
-    img.className = 'preview';
-    img.src = retrievedData;
-    return img;
-}
-
 
 /**
  * Get the tab ID for the given tree node DOM element.

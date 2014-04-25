@@ -169,6 +169,10 @@ a.switch-to-tab:hover {
     display: none;
 }
 
+.node {
+    cursor: pointer;
+}
+
 .node.fake {
     background-color: "999999";
 }
@@ -187,7 +191,13 @@ a.switch-to-tab:hover {
     font-size: 0.8em;
 }
 
-/* Nodes with depth > 2 */
+
 .node[depth="3"] {
     font-size: 0.6em;
+}
+
+/* Nodes with depth > 3 */
+.node:not([depth="0"]):not([depth="1"]):not([depth="2"]):not([depth="3"]) {
+    /* font-size: 0.6em; */
+    display: none;
 }
