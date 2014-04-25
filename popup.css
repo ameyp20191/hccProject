@@ -16,9 +16,10 @@ img {
 }
 
 h2 {
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-weight: normal;
     margin-bottom: -3px;
+    color: orange;
 }
 
 a {
@@ -29,6 +30,7 @@ a {
 
 a:hover {
     color: red;
+    font-size: 0.9em;
 }
 
 .url-popdown {
@@ -51,11 +53,16 @@ a:hover {
     color: navy;
     cursor: pointer;
     font-size: 0.8em;
-    font-family: cantarell;
+    /*font-family: cantarell;*/
     margin: 0;
     padding: 0;
     outline: none;
     outline-offset: 0;
+}
+
+.tab-action-link:hover {
+    color: red;
+    font-size: 0.9em;
 }
 
 .tab-link:hover {
