@@ -82,13 +82,14 @@ chrome.tabs.onCreated.addListener(function(tab) {
 /*
  * listener for preview of activated tab  
 */
-chrome.tabs.onActivated.addListener(function (activeInfo) {
-    console.log(activeInfo.tabId);
-    var tabId = activeInfo.tabId;
-    chrome.tabs.captureVisibleTab(function (imgDataURL) {
-        localStorage.setItem(tabId.toString(), imgDataURL);
-    });
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    if (tab.active == true && changeInfo.status == "complete"){
+        chrome.tabs.captureVisibleTab(function (imgDataURL) {
+            localStorage.setItem(tabId.toString(), imgDataURL);
+        });
+    }
 });
+
 
 /*
  * remove image data from localStorage when tab is closed 
