@@ -58,14 +58,11 @@ function toJstreeJson(obj) {
  */
 function showTreeInPanel(json) {
   var elt = $('#tabs-tree-panel');
-  var jsonClone = JSON.parse(JSON.stringify(json));
-  //console.log(JSON.stringify(jsonClone));
-  console.log(json);
-  console.log('after deletion: ');
-  toJstreeJson(jsonClone);
-  console.log(jsonClone);
-
   elt.jstree('destroy');
+
+  var jsonClone = JSON.parse(JSON.stringify(json));
+  toJstreeJson(jsonClone);
+
   elt.jstree({
     'core': {
       'animation': 100,
