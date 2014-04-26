@@ -133,7 +133,7 @@ function init(groupBy){
           tip.innerHTML = '<b>' + node.data.title + '</b> <br/>' + node.data.url + '<br/>';
         }
         var img = getTabImage(node.id); // add preview under the url
-        if( img ) {
+        if( img != null ) {
           tip.className = 'tip with-preview';
           tip.appendChild(img);
         }
@@ -214,6 +214,24 @@ function init(groupBy){
   });
 
   displayTree(groupBy);
+}
+
+
+/*
+* Get the preview of required Tab from localStorage
+* @param {tabID} id of required tab
+* @returns {img} html element for the preview of required tab
+*/
+function getTabImage(tabID) {
+    var retrievedData = localStorage.getItem(tabID);
+    var img = document.createElement('img');
+    if (retrievedData === "undefined" || retrievedData === null)
+        return null;
+    img.src = retrievedData;
+    img.style.maxWidth = '280px';
+    img.border = '2px';
+
+    return img;
 }
 
 /**
