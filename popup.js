@@ -181,7 +181,7 @@ $(document).ready(function() {
       showMarkAction(extensionLinksDiv);
       var visualizeLink = $('<a/>', {id: 'visualize-link',
                                      href: 'visualization/hypertree.html',
-                                     text: 'Visualization'}).appendTo(extensionLinksDiv);
+                                     text: 'Navigation'}).appendTo(extensionLinksDiv);
       var helpLink = $('<a/>', {id: 'help-link',
                                 href: 'help.html', text: 'Help'}).appendTo(extensionLinksDiv);
 

@@ -18,7 +18,7 @@ img {
 h2 {
     font-size: 1.1em;
     font-weight: normal;
-    margin-bottom: -3px;
+    margin-bottom: 0.1em;
     color: orange;
 }
 
@@ -40,6 +40,7 @@ a:hover {
 
 .url-info {
     font-size: 0.7em;
+    margin-bottom: 0.2em;
 }
 
 .current-tab-info {
