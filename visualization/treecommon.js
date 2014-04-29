@@ -45,6 +45,32 @@ function tabToNode(tab) {
 
 
 /**
+ * Switch to a given tab.
+ */
+function switchToTab(tabId, callback) {
+  tabId = parseInt(tabId);
+  chrome.tabs.update(tabId, {active: true}, callback);
+};
+
+
+/**
+ * Toggle the marked state of a tab.
+ */
+function toggleMarkTab(tabId, callback) {
+  var background = chrome.extension.getBackgroundPage();
+  var tabsMarked = background.tabsMarked;
+  var markTab = background.markTab;
+  var unmarkTab = background.unmarkTab;
+
+  if (tabsMarked.indexOf(tabId) >= 0) {
+    unmarkTab(tabId);
+  }
+  else {
+    markTab(tabId);
+  }
+}
+
+/**
  * Get the preview of required Tab from localStorage
  * @param {tabID} id of required tab
  * @returns {img} html element for the preview of required tab

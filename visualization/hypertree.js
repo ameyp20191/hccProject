@@ -48,6 +48,18 @@ function loadFavIcons() {
   });
 }
 
+function isFakeOrRoot(node) {
+  return node.data.fake || node.id == "root-node";
+}
+
+function focusOnNode(id) {
+  ht.onClick(id, {
+    onComplete: function() {
+      ht.controller.onComplete();
+    }
+  });
+}
+
 var ht;
 var panelTree;
 function init(groupBy){
@@ -98,27 +110,46 @@ function init(groupBy){
 
     Events: {
       enable: true,
+
+      // Switch to tab on left click
       onClick: function(node, eventInfo, e) {
         if (eventInfo.node) {
           console.log('node name = ', eventInfo.node.name);
 
-          ht.onClick(eventInfo.node.id, {
-            onComplete: function() {
-              ht.controller.onComplete();
-            }
-          });
+          if (isFakeOrRoot(eventInfo.node)) {
+            focusOnNode(eventInfo.node.id);
+          }
+          else {
+            switchToTab(eventInfo.node.id);
+          }
+        }
+      },
+
+      // Mark or unmark tab on right click, doesn't work as
+      // eventInfo.pos is false
+      onRightClick: function(node, eventInfo, e) {
+        if (eventInfo.node) {
+          if (!isFakeOrRoot(eventInfo.node)) {
+            toggleMarkTab(eventInfo.node.id);
+          }
         }
       }
     },
 
+    // Animation is buggy. Changing the node style on hover frequently
+    // messes up subsequent centerings. If a node is centered, it ends
+    // up not being at the centre. Centering the same node multiple
+    // times causes its position to change. The correct behaviour is
+    // for the node position to remain the same on multiple centerings
+    // (i.e., at the centre of the canvas).
     NodeStyles: {
       enable: true,
-      type: 'Native',
-      stylesHover: {
-        dim: 30,
-        color: '#fcc'
-      },
-      duration: 600
+      type: 'Native'
+      // stylesHover: {
+      //    dim: 30,
+      //    color: '#fcc'
+      //  },
+      // duration: 600
     },
 
     Tips: {
@@ -145,6 +176,13 @@ function init(groupBy){
         }
         else {
           tip.className = 'tip';
+        }
+
+        if (!isFakeOrRoot(node)) {
+          tip.innerHTML += '<br/><em>Click to switch</em>';
+        }
+        else {
+          tip.innerHTML += '<br/><em>Click to focus</em>';
         }
       }
     },
@@ -191,12 +229,8 @@ function init(groupBy){
       }
       
       $jit.util.addEvent(domElement, 'click', function () {
-        if (node.id) {
-          ht.onClick(node.id, {
-            onComplete: function() {
-              ht.controller.onComplete();
-            }
-          });
+        if (node.id && isFakeOrRoot(node)) {
+          focusOnNode(node.id);
         }
       });
     },
@@ -217,7 +251,7 @@ function init(groupBy){
       Log.write("");
       addClickToAnnotationPanel();
       addClickToAnnotation();
-      addClickToSwitch();
+      //addClickToSwitch();
     }
   });
 
@@ -398,13 +432,10 @@ function addClickToSwitch() {
     if ($(this).has('a.switch-to-tab').length > 0) {
       return;
     }
-    var switchToTab = $('<a/>', {'class': 'switch-to-tab', 'text': ' ▶'});
+    var switchToTabLink = $('<a/>', {'class': 'switch-to-tab', 'text': ' ▶'});
     var tabId = parseInt($(this).attr('id'));
-    switchToTab.click(function() {
-      chrome.tabs.update(tabId, {active: true});
-      return false;
-    });
-    $(this).append(switchToTab);
+    switchToTabLink.click(function() { switchToTab(tabId); return false; });
+    $(this).append(switchToTabLink);
   });
 }
 
@@ -505,7 +536,7 @@ function getGroupBy() {
 $(document).ready(function() {
   $('body').on('click', 'a.tab-link', function() {
     var tabId = getTabId(this);
-    chrome.tabs.update(tabId, {active: true}, function() {});
+    switchToTab(tabId);
     return false;
   });
 
