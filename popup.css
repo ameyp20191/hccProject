@@ -34,6 +34,10 @@ a:hover {
     text-decoration: underline; 
 }
 
+.no-tabs-marked {
+    font-size: 0.8em;
+}
+
 .url-popdown {
     font-size: 0.8em;
     color: rgb(79, 109, 109);

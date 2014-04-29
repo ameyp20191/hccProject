@@ -114,7 +114,6 @@ function showMostRecentUrls(searchText, maxUrls, node) {
 
 /**
  * Show links to the marked tabs.
- * TODO: If the user marks/unmarks the current tab from the popup, update the list immediately.
  * @param {Element} node - DOM element to attach the list to.
  */
 function showMarkedTabs(node) {
@@ -128,8 +127,13 @@ function showMarkedTabsContent(content) {
   var background = chrome.extension.getBackgroundPage();
   var tabsMarked = background.tabsMarked;
 
+  if (tabsMarked.length == 0) {
+    var noTabsMarkedText = "Mark a tab by clicking 'Mark' above or using Ctrl+Shift+S when this popup is closed.";
+    var noTabsMarkedDiv = $('<div/>', {'class': 'no-tabs-marked', 
+                                       text: noTabsMarkedText}).appendTo(content);
+  }
+
   for (var i=0; i<tabsMarked.length; i++) {
-    console.log(tabsMarked[i]);
     var tabId = tabsMarked[i];
     chrome.tabs.get(tabId, function(tab) {
       var tabLinkDiv = $('<div/>', {}).appendTo(content);
