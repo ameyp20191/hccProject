@@ -57,7 +57,7 @@ function showMostVisitedUrls(searchText, startTime, maxUrls, node) {
       urlPopdownDiv.hide();
 
       link.data('urlPopdownDiv', urlPopdownDiv);
-      link.hover(function() { $(this).data('urlPopdownDiv').show(); }, 
+      link.hover(function() { $(this).data('urlPopdownDiv').show(); },
                  function() { $(this).data('urlPopdownDiv').hide(); });
 
       $('<div/>', {'class': 'url-info', text: 'Count: ' + r.visitCount}).appendTo(content);
@@ -102,7 +102,7 @@ function showMostRecentUrls(searchText, maxUrls, node) {
       urlPopdownDiv.hide();
 
       link.data('urlPopdownDiv', urlPopdownDiv);
-      link.hover(function() { $(this).data('urlPopdownDiv').show(); }, 
+      link.hover(function() { $(this).data('urlPopdownDiv').show(); },
                  function() { $(this).data('urlPopdownDiv').hide(); });
 
       $('<div/>', {'class': 'url-info',
@@ -128,9 +128,11 @@ function showMarkedTabsContent(content) {
   var tabsMarked = background.tabsMarked;
 
   if (tabsMarked.length == 0) {
-    var noTabsMarkedText = "Mark a tab by clicking 'Mark' above or using Ctrl+Shift+S when this popup is closed.";
-    var noTabsMarkedDiv = $('<div/>', {'class': 'no-tabs-marked', 
-                                       text: noTabsMarkedText}).appendTo(content);
+    var noTabsMarkedHTML = "Mark a tab by clicking 'Mark' above or using " +
+          "Ctrl+Shift+S when this popup is closed. <br/>" +
+          "Use Ctrl+Shift+Z to quickly switch between marked tabs.";
+    var noTabsMarkedDiv = $('<div/>', {'class': 'no-tabs-marked'}).appendTo(content);
+    noTabsMarkedDiv.html(noTabsMarkedHTML);
   }
 
   for (var i=0; i<tabsMarked.length; i++) {
@@ -185,7 +187,7 @@ $(document).ready(function() {
       showMarkAction(extensionLinksDiv);
       var visualizeLink = $('<a/>', {id: 'visualize-link',
                                      href: 'visualization/hypertree.html',
-                                     text: 'Navigation'}).appendTo(extensionLinksDiv);
+                                     text: 'Explore tabs'}).appendTo(extensionLinksDiv);
       var helpLink = $('<a/>', {id: 'help-link',
                                 href: 'help.html', text: 'Help'}).appendTo(extensionLinksDiv);
 

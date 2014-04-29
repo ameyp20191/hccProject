@@ -70,7 +70,7 @@ function showTreeInPanel(json) {
       'data': jsonClone
     },
     'plugins': [
-      'search', 'state', 'types'
+      'search', 'state', 'types', 'wholerow'
     ]
   });
 }
