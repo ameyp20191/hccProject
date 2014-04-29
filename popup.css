@@ -1,7 +1,7 @@
 body {
     min-width: 550px;
     overflow-x: hidden;
-    background-color: lightyellow;
+    background-color: white;
     /* font-family: cantarell; */
     font-family: Arial, Helvetica, sans-serif;
     font-size: 0.9em;
@@ -29,8 +29,9 @@ a {
 }
 
 a:hover {
-    color: red;
-    font-size: 0.9em;
+    color: navy;
+    /*font-size: 0.9em;*/
+    text-decoration: underline; 
 }
 
 .url-popdown {
@@ -62,12 +63,14 @@ a:hover {
 }
 
 .tab-action-link:hover {
-    color: red;
-    font-size: 0.9em;
+    /*color: red;
+    font-size: 0.8em;*/
+    text-decoration: underline; 
 }
 
 .tab-link:hover {
-    color: red;
+    /*color: red;*/
+    text-decoration: underline; 
 }
 
 #extension-links {
