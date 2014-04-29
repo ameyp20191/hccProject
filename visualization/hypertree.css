@@ -5,7 +5,8 @@ html, body {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 0.9em;
     text-align: center;
-    background-color:#F2F2F2;
+    background-color: rgba(192, 211, 206, 0.22)
+    /* background-color:#F2F2F2; */
 }
 
 input, select {
@@ -17,11 +18,15 @@ table {
     margin-left:7px;
 }
 
-h4 {
+h3 {
     font-size:1.1em;
     text-decoration:none;
     font-weight:normal;
     /* color:#23A4FF; */
+}
+
+h4 {
+    font-size:0.9em;
 }
 
 a {
@@ -31,7 +36,7 @@ a {
 
 #container {
     width: 1000px;
-    height: 600px;
+    /* height: 600px; */
     margin:0 auto;
     position:relative;
 }

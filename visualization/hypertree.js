@@ -101,6 +101,12 @@ function init(groupBy){
       onClick: function(node, eventInfo, e) {
         if (eventInfo.node) {
           console.log('node name = ', eventInfo.node.name);
+
+          ht.onClick(eventInfo.node.id, {
+            onComplete: function() {
+              ht.controller.onComplete();
+            }
+          });
         }
       }
     },
@@ -185,11 +191,13 @@ function init(groupBy){
       }
       
       $jit.util.addEvent(domElement, 'click', function () {
-        ht.onClick(node.id, {
-          onComplete: function() {
-            ht.controller.onComplete();
-          }
-        });
+        if (node.id) {
+          ht.onClick(node.id, {
+            onComplete: function() {
+              ht.controller.onComplete();
+            }
+          });
+        }
       });
     },
 
