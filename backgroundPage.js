@@ -4,7 +4,119 @@ var wholePage;
 var categories = {};
 var tabQueue = [];
 
+var log = {};
+var doLog = false;
+
 var groupBy = 'url';            // Default tree grouping criterion
+
+/*
+ * Logging actions
+ */
+function initLog() {
+  log['startTime'] = Date.now();
+  log['endTime'] = 0;
+
+  log['tabsOpen'] = {};
+  log['tabsCreated'] = 0;       // Total number of tabs created
+  log['tabsMoved'] = 0;
+  log['tabsClosed'] = 0;
+  log['tabsActivated'] = {'id': [], 'index': [], 'time': []};    // Time, position and ID of active tab
+
+  log['tabsMarked'] = {'time': [], 'numOpenTabs': [], 'numMarkedTabs': []};
+  log['visualizationOpened'] = {'time': [], 'numOpenTabs': []};
+}
+
+initLog();
+
+/*
+ * Track the number of open tabs in the current window over time
+ */
+function logTabsOpen() {
+  chrome.tabs.query({currentWindow: true}, function(tabs) {
+    var windowId = tabs[0].windowId;
+    if (!(windowId in log['tabsOpen'])) {
+      log['tabsOpen'][windowId] = {'time': [], 'num': []};
+    }
+
+    // Log the timestamp and number of tabs open for each window
+    log['tabsOpen'][windowId]['time'].push(Date.now());
+    log['tabsOpen'][windowId]['num'].push(tabs.length);
+  });
+}
+
+function logTabCreated() {
+  log['tabsCreated']++;
+  logTabsOpen();
+}
+
+function logTabClosed() {
+  log['tabsClosed']++;
+  logTabsOpen();
+}
+
+function logTabMoved() {
+  log['tabsMoved']++;
+}
+
+function logTabsActivated(activeInfo) {
+  log['tabsActivated']['id'].push(activeInfo.tabId);
+  log['tabsActivated']['time'].push(Date.now());
+  chrome.tabs.get(activeInfo.tabId, function(tab) {
+    log['tabsActivated']['index'].push(tab.index);
+  });
+}
+
+/* 
+ * Log the time and the number of open tabs when the visualization is
+ * opened
+ */
+function logVisualizationOpened() {
+  log['visualizationOpened']['time'].push(Date.now());
+  chrome.tabs.query({currentWindow: true}, function(tabs) {
+    var numOpenTabs = tabs.length;
+    log['visualizationOpened']['numOpenTabs'].push(numOpenTabs);
+  });
+}
+
+/*
+ * Log the time, number of open tabs and number of marked tabs
+ */
+function logTabsMarked() {
+  log['tabsMarked']['time'].push(Date.now());
+  log['tabsMarked']['numMarkedTabs'].push(tabsMarked.length);
+  chrome.tabs.query({currentWindow: true}, function(tabs) {
+    var numOpenTabs = tabs.length;
+    log['tabsMarked']['numOpenTabs'].push(numOpenTabs);
+  });
+}
+
+function toggleLogging() {
+  if (doLog) {
+    stopLogging();
+  }
+  else {
+    startLogging();
+  }
+}
+
+function startLogging() {
+  doLog = true;
+  initLog();
+  chrome.tabs.onCreated.addListener(logTabCreated);
+  chrome.tabs.onRemoved.addListener(logTabClosed);
+  chrome.tabs.onMoved.addListener(logTabMoved);
+  chrome.tabs.onActivated.addListener(logTabsActivated);
+}
+
+function stopLogging() {
+  log['endTime'] = Date.now();
+  doLog = false;
+  chrome.tabs.onCreated.removeListener(logTabCreated);
+  chrome.tabs.onRemoved.removeListener(logTabClosed);
+  chrome.tabs.onMoved.removeListener(logTabMoved);
+  chrome.tabs.onActivated.removeListener(logTabsActivated);
+}
+
 
 /*
  * Handle keyboard shortcuts
@@ -13,6 +125,8 @@ chrome.commands.onCommand.addListener(function(command) {
   if (command === "launch-visualization") {
     chrome.tabs.query({title: "Visualize tabs"}, function(tabs) {
       if (tabs.length == 0) {
+        if (doLog)
+          logVisualizationOpened();
         chrome.tabs.create({url: "visualization/hypertree.html"});
       }
       else {
@@ -119,6 +233,10 @@ function markTab(tabId, callback) {
   if (tabsMarked.indexOf(tabId) == -1) {
     tabsMarked.push(tabId);
     chrome.tabs.executeScript(parseInt(tabId), {code: markScript}, callback);
+    
+    if (doLog) { 
+      logTabsMarked();
+    }
   }
 }
 
@@ -134,6 +252,10 @@ function unmarkTab(tabId, callback) {
   if (index > -1) {
     tabsMarked.splice(index, 1);
     chrome.tabs.executeScript(parseInt(tabId), {code: unmarkScript}, callback);
+
+    if (doLog) {
+      logTabsMarked();
+    }
   }
 }
 

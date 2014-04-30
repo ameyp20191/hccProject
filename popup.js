@@ -188,6 +188,13 @@ $(document).ready(function() {
       var visualizeLink = $('<a/>', {id: 'visualize-link',
                                      href: 'visualization/hypertree.html',
                                      text: 'Explore tabs'}).appendTo(extensionLinksDiv);
+      visualizeLink.click(function() {
+        var background = chrome.extension.getBackgroundPage();
+        if (background.doLog) {
+          // background.logVisualizationOpened();
+        }
+      });
+
       var helpLink = $('<a/>', {id: 'help-link',
                                 href: 'help.html', text: 'Help'}).appendTo(extensionLinksDiv);
 

@@ -1,0 +1,37 @@
+<html>
+  <head>
+    <title>User study</title>
+    <script src="/thirdparty/jquery-2.1.0.min.js"></script>
+    <script language="javascript" type="text/javascript" src="userstudy.js"></script>
+  </head>
+
+  <body>
+    <h1>User study</h1>
+    
+    <div id="study-info">
+      We really appreciate you taking the time to participate in the
+      study. With your consent, we will observe how you use the
+      browser with and without the EasyNavigator extension and collect
+      some metrics.
+
+      <p>
+        The metrics include only <b>numerical information</b> (no
+        URLs), for example the number of tabs you open and the number
+        of times you switch between tabs.
+      </p>
+    </div>
+
+    <input type="button" id="toggle-study"/>
+    <input type="button" value="Show nice log" id="show-nice-log"/>
+    <input type="button" value="Show compact log" id="show-compact-log"/>
+
+    <span style="position: absolute; width: 500px; text-align: right">
+      <input type="button" value="Clear log" id="clear-log" style="color: red"/>
+    </span>
+
+    <pre id="log-content"></pre>
+
+    <br />
+
+  </body>
+</html>

@@ -551,3 +551,10 @@ $(document).ready(function() {
 
   setupTree(getGroupBy());
 });
+
+$(window).focus(function() {
+  var background = chrome.extension.getBackgroundPage();
+  if (background.doLog) {
+    background.logVisualizationOpened();
+  }
+});
