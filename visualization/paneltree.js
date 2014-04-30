@@ -1,5 +1,7 @@
 /* Tree which is shown on the panel to the right. */
 
+var panelTreeDomId = '#tabs-tree-panel';
+
 var panelTreeIdPrefix = 'panel-tree-';
 var panelTreeFakePrefix = panelTreeIdPrefix + 'fake-';
 var panelTreeTabPrefix = panelTreeIdPrefix + 'tab-';
@@ -41,7 +43,7 @@ function fromJstreeId(jstreeId) {
     return null;
   }
 
-  return jstreeId.substring(prefix.length);
+  return parseInt(jstreeId.substring(prefix.length));
 }
 
 /**
@@ -93,6 +95,13 @@ function toJstreeJson(obj) {
 }
 
 
+function refreshTabNodeText(node) {
+  var tabId = fromJstreeId(node.id);
+  chrome.tabs.get(tabId, function(tab) {
+    $(panelTreeDomId).jstree('set_text', node, shortenText(tab.title));
+  });
+}
+
 function tabNodeContextMenu(node) {
   var tabId = fromJstreeId(node.id);
 
@@ -103,13 +112,21 @@ function tabNodeContextMenu(node) {
 
   var markAction = {
     'label': 'Mark tab',
-    'action': function(obj) { toggleMarkTab(tabId); }
+    'action': function(obj) { 
+      toggleMarkTab(tabId, function() { 
+        refreshTabNodeText(node); 
+      });
+    }
   };
   var showMarkAction = !isMarked(tabId);
 
   var unmarkAction = {
     'label': 'Unmark tab',
-    'action': function(obj) { toggleMarkTab(tabId); }
+    'action': function(obj) { 
+      toggleMarkTab(tabId, function() {
+        refreshTabNodeText(node); 
+      });
+    }
   };
   var showUnmarkAction = isMarked(tabId);
 

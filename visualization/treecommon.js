@@ -59,11 +59,10 @@ function switchToTab(tabId, callback) {
 
 
 function isMarked(tabId) {
-  tabId = parseInt(tabId);
   var background = chrome.extension.getBackgroundPage();
   var tabsMarked = background.tabsMarked;
   
-  if (tabsMarked.indexOf(tabId) >= 0) {
+  if (tabsMarked.indexOf(parseInt(tabId)) >= 0) {
     return true;
   }
   return false;
@@ -73,15 +72,16 @@ function isMarked(tabId) {
  * Toggle the marked state of a tab.
  */
 function toggleMarkTab(tabId, callback) {
+  tabId = parseInt(tabId);
   var background = chrome.extension.getBackgroundPage();
   var markTab = background.markTab;
   var unmarkTab = background.unmarkTab;
 
   if (isMarked(tabId)) {
-    unmarkTab(tabId);
+    unmarkTab(tabId, callback);
   }
   else {
-    markTab(tabId);
+    markTab(tabId, callback);
   }
 }
 
