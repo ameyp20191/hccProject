@@ -1,16 +1,26 @@
 /* Tree which is shown on the panel to the right. */
 
 var panelTreeIdPrefix = 'panel-tree-';
+var panelTreeFakePrefix = panelTreeIdPrefix + 'fake-';
+var panelTreeTabPrefix = panelTreeIdPrefix + 'tab-';
 
+/**
+ * Get ID of a fake node in the panel tree for a given node ID.
+ * @param {String} id - ID of the fake node
+ * @returns {String} ID of panel element representing the fake node
+ */
+function toJstreeFakeId(id) {
+  return panelTreeFakePrefix + id;
+}
 
 /**
  * Get ID of a node in the panel tree for a given tab ID.
  * @param {String} tabId - Tab ID
  * @returns {String} ID of panel element representing the given tab
  */
-function toJstreeId(tabId) {
+function toJstreeTabId(tabId) {
   // Use a prefix for IDs to avoid conflicts with hypertree nodes
-  return panelTreeIdPrefix + tabId;
+  return panelTreeTabPrefix + tabId;
 }
 
 
@@ -20,7 +30,32 @@ function toJstreeId(tabId) {
  * @returns {String} Tab ID (or ID of node in hypertree if not a tab)
  */
 function fromJstreeId(jstreeId) {
-  return jstreeId.substring(panelTreeIdPrefix.length);
+  var prefix;
+  if (jstreeId.indexOf(panelTreeFakePrefix) == 0) {
+    prefix = panelTreeFakePrefix;
+  }
+  else if (jstreeId.indexOf(panelTreeTabPrefix) == 0) {
+    prefix = panelTreeTabPrefix;
+  }
+  else {
+    return null;
+  }
+
+  return jstreeId.substring(prefix.length);
+}
+
+/**
+ * Check if the given jstree ID represents a tab.
+ */
+function isTabId(jstreeId) {
+  return jstreeId.indexOf(panelTreeTabPrefix) == 0;
+}
+
+/**
+ * Check if the given jstree ID represents a fake node.
+ */
+function isFakeId(jstreeId) {
+  return jstreeId.indexOf(panelTreeFakePrefix) == 0;
 }
 
 
@@ -29,7 +64,13 @@ function fromJstreeId(jstreeId) {
  * @param {Object} obj - JSON object compatible with the hypertree
  */
 function toJstreeJson(obj) {
-  obj.id = toJstreeId(obj.id);
+  if (isFakeOrRoot(obj)) {
+    obj.id = toJstreeFakeId(obj.id);
+  }
+  else {
+    obj.id = toJstreeTabId(obj.id);
+  }
+
   obj.text = obj.name;
   obj.state = {'opened': true};
 
@@ -52,6 +93,51 @@ function toJstreeJson(obj) {
 }
 
 
+function tabNodeContextMenu(node) {
+  var tabId = fromJstreeId(node.id);
+
+  var switchAction = { 
+    'label': 'Switch to tab',
+    'action': function(obj) { switchToTab(tabId); }
+  };
+
+  var markAction = {
+    'label': 'Mark tab',
+    'action': function(obj) { toggleMarkTab(tabId); }
+  };
+  var showMarkAction = !isMarked(tabId);
+
+  var unmarkAction = {
+    'label': 'Unmark tab',
+    'action': function(obj) { toggleMarkTab(tabId); }
+  };
+  var showUnmarkAction = isMarked(tabId);
+
+  var items = {};
+  items['Switch'] = switchAction;
+  if (showMarkAction) {
+    items['Mark'] = markAction;
+  }
+  else if (showUnmarkAction) { 
+    items['Unmark'] = unmarkAction;
+  }
+
+  return items;
+}
+
+function fakeNodeContextMenu(node) {
+  var nodeId = fromJstreeId(node.id);
+
+  var focusAction = {
+    'label': 'Focus node',
+    'action': function(obj) { focusOnNode(nodeId); }
+  };
+
+  var items = {};
+  items['Focus'] = focusAction;
+  return items;
+}
+
 /**
  * Show tree in the panel
  * @param {Object} json - JSON object from the hypertree
@@ -70,7 +156,14 @@ function showTreeInPanel(json) {
       'data': jsonClone
     },
     'plugins': [
-      'search', 'state', 'types', 'wholerow'
-    ]
+      'search', 'state', 'types', 'wholerow', 'contextmenu'
+    ],
+    'contextmenu': {
+      'items': function($node) {
+        if (isTabId($node.id)) return tabNodeContextMenu($node);
+        else if (isFakeId($node.id)) return fakeNodeContextMenu($node);
+        else return {};
+      }
+    }
   });
 }

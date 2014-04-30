@@ -1,3 +1,8 @@
+/* Global declaration of tree objects */
+var ht;
+var panelTree;
+
+
 /**
  * Return text shortened to 21 characters.
  * @param {String} text - Text to be shortened
@@ -53,16 +58,26 @@ function switchToTab(tabId, callback) {
 };
 
 
+function isMarked(tabId) {
+  tabId = parseInt(tabId);
+  var background = chrome.extension.getBackgroundPage();
+  var tabsMarked = background.tabsMarked;
+  
+  if (tabsMarked.indexOf(tabId) >= 0) {
+    return true;
+  }
+  return false;
+};  
+
 /**
  * Toggle the marked state of a tab.
  */
 function toggleMarkTab(tabId, callback) {
   var background = chrome.extension.getBackgroundPage();
-  var tabsMarked = background.tabsMarked;
   var markTab = background.markTab;
   var unmarkTab = background.unmarkTab;
 
-  if (tabsMarked.indexOf(tabId) >= 0) {
+  if (isMarked(tabId)) {
     unmarkTab(tabId);
   }
   else {
@@ -84,3 +99,18 @@ function getTabImage(tabID) {
     img.src = retrievedData;
     return img;
 }
+
+
+function isFakeOrRoot(node) {
+  return node.data.fake || node.id == "root-node";
+}
+
+
+function focusOnNode(id) {
+  ht.onClick(id, {
+    onComplete: function() {
+      ht.controller.onComplete();
+    }
+  });
+}
+

@@ -52,16 +52,6 @@ function isFakeOrRoot(node) {
   return node.data.fake || node.id == "root-node";
 }
 
-function focusOnNode(id) {
-  ht.onClick(id, {
-    onComplete: function() {
-      ht.controller.onComplete();
-    }
-  });
-}
-
-var ht;
-var panelTree;
 function init(groupBy){
   $jit.Hypertree.Plot.NodeTypes.implement({
     'image': {
