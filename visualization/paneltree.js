@@ -35,15 +35,19 @@ function fromJstreeId(jstreeId) {
   var prefix;
   if (jstreeId.indexOf(panelTreeFakePrefix) == 0) {
     prefix = panelTreeFakePrefix;
+    // Fake node ID is a String
+    return jstreeId.substring(prefix.length);
   }
   else if (jstreeId.indexOf(panelTreeTabPrefix) == 0) {
     prefix = panelTreeTabPrefix;
+    // Tab node ID is an integer
+    return parseInt(jstreeId.substring(prefix.length));
   }
   else {
     return null;
   }
 
-  return parseInt(jstreeId.substring(prefix.length));
+
 }
 
 /**
