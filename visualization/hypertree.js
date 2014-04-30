@@ -110,7 +110,9 @@ function init(groupBy){
             focusOnNode(eventInfo.node.id);
           }
           else {
-            switchToTab(eventInfo.node.id);
+            switchToTab(eventInfo.node.id, function() {
+              chrome.extension.getBackgroundPage().logSwitchToTabFromVisualization();
+            });
           }
         }
       },
@@ -412,25 +414,6 @@ function getCategoriesAndUpdateTree() {
 
 
 /**
- * Add icon for switching to tab
- */
-function addClickToSwitch() {
-  $('div.node').each(function() {
-    if ($(this).attr('fake') == 'true' || $(this).attr('id') == 'root-node') {
-      return;
-    }
-    if ($(this).has('a.switch-to-tab').length > 0) {
-      return;
-    }
-    var switchToTabLink = $('<a/>', {'class': 'switch-to-tab', 'text': ' ▶'});
-    var tabId = parseInt($(this).attr('id'));
-    switchToTabLink.click(function() { switchToTab(tabId); return false; });
-    $(this).append(switchToTabLink);
-  });
-}
-
-
-/**
  * Add markings to annotate tabs
  */
 function addClickToAnnotation() {  
@@ -452,7 +435,8 @@ function addClickToAnnotation() {
       mark.click(function() {
         mark.hide();
         unmark.show();        
-        chrome.extension.getBackgroundPage().unmarkTab(tabID);
+        // Unmark tab
+        toggleMarkTab(tabID);
         
         // click on the right panel
         $('li .tab-link').each(function() {
@@ -471,7 +455,10 @@ function addClickToAnnotation() {
         event.preventDefault();
         unmark.hide();
         mark.show();        
-        chrome.extension.getBackgroundPage().markTab(tabID);
+        // Mark tab
+        toggleMarkTab(tabID, function() {
+          chrome.extension.getBackgroundPage().logMarkTabFromVisualization();
+        });
         
         // click on the right panel
         $('li .tab-link').each(function() {
@@ -526,7 +513,9 @@ function getGroupBy() {
 $(document).ready(function() {
   $('body').on('click', 'a.tab-link', function() {
     var tabId = getTabId(this);
-    switchToTab(tabId);
+    switchToTab(tabId, function() {
+      chrome.extension.getBackgroundPage().logSwitchToTabFromVisualization();
+    });
     return false;
   });
 

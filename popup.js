@@ -56,6 +56,7 @@ function showMostVisitedUrls(searchText, startTime, maxUrls, node) {
       var urlPopdownAnchor = $('<span/>', {text: r.url}).appendTo(urlPopdownDiv);
       urlPopdownDiv.hide();
 
+      link.click(function() { chrome.extension.getBackgroundPage().logOpenFrequentFromPopup(); });
       link.data('urlPopdownDiv', urlPopdownDiv);
       link.hover(function() { $(this).data('urlPopdownDiv').show(); },
                  function() { $(this).data('urlPopdownDiv').hide(); });
@@ -101,6 +102,7 @@ function showMostRecentUrls(searchText, maxUrls, node) {
       var urlPopdownAnchor = $('<span/>', {text: r.url}).appendTo(urlPopdownDiv);
       urlPopdownDiv.hide();
 
+      link.click(function() { chrome.extension.getBackgroundPage().logOpenRecentFromPopup(); });
       link.data('urlPopdownDiv', urlPopdownDiv);
       link.hover(function() { $(this).data('urlPopdownDiv').show(); },
                  function() { $(this).data('urlPopdownDiv').hide(); });
@@ -162,7 +164,9 @@ $(document).ready(function() {
   // Clicking a tab link switches to the tab
   $('body').on('click', 'button.tab-switch-link', function(event) {
     var tabId = parseInt($(this).attr('tabId'));
-    chrome.tabs.update(tabId, {active: true}, function() {});
+    chrome.tabs.update(tabId, {active: true}, function() {
+      chrome.extension.getBackgroundPage().logSwitchToMarkedTabFromPopup();
+    });
   });
 
   chrome.tabs.query(
@@ -190,13 +194,15 @@ $(document).ready(function() {
                                      text: 'Explore tabs'}).appendTo(extensionLinksDiv);
       visualizeLink.click(function() {
         var background = chrome.extension.getBackgroundPage();
-        if (background.doLog) {
-          // background.logVisualizationOpened();
-        }
+        background.logVisualizationOpenedFromPopup();
       });
 
       var helpLink = $('<a/>', {id: 'help-link',
                                 href: 'help.html', text: 'Help'}).appendTo(extensionLinksDiv);
+      helpLink.click(function() {
+        var background = chrome.extension.getBackgroundPage();
+        background.logHelpOpenedFromPopup();
+      });        
 
       showMarkedTabs(markedTabsDiv);
       showMostVisitedUrls(tabDomain.valueOf(), oneMonthAgo, maxUrls, mostVisitedDiv);
@@ -208,7 +214,10 @@ $(document).ready(function() {
 function markCurrentTab() {
   var background = chrome.extension.getBackgroundPage();
   chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
-    background.markTab(tabs[0].id, updateMarkedTabsLinks);
+    background.markTab(tabs[0].id, function() {
+      updateMarkedTabsLinks();
+      background.logMarkTabFromPopup();
+    });
   });
 }
 
@@ -218,3 +227,10 @@ function unmarkCurrentTab() {
     background.unmarkTab(tabs[0].id, updateMarkedTabsLinks);
   });
 }
+
+$(window).focus(function() {
+  var background = chrome.extension.getBackgroundPage();
+  if (background.doLog) {
+    background.logPopupOpened();
+  }
+});

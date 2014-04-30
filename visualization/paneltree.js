@@ -111,7 +111,11 @@ function tabNodeContextMenu(node) {
 
   var switchAction = { 
     'label': 'Switch to tab',
-    'action': function(obj) { switchToTab(tabId); }
+    'action': function(obj) { 
+      switchToTab(tabId, function() { 
+        chrome.extension.getBackgroundPage().logSwitchToTabFromPanelTree();
+      });
+    }
   };
 
   var markAction = {
@@ -119,6 +123,7 @@ function tabNodeContextMenu(node) {
     'action': function(obj) { 
       toggleMarkTab(tabId, function() { 
         refreshTabNodeText(node); 
+        chrome.extension.getBackgroundPage().logMarkTabFromPanelTree();
       });
     }
   };

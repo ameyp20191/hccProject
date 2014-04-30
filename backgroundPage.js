@@ -6,6 +6,7 @@ var tabQueue = [];
 
 var log = {};
 var doLog = false;
+var logInitialized = false;
 
 var groupBy = 'url';            // Default tree grouping criterion
 
@@ -23,7 +24,29 @@ function initLog() {
   log['tabsActivated'] = {'id': [], 'index': [], 'time': []};    // Time, position and ID of active tab
 
   log['tabsMarked'] = {'time': [], 'numOpenTabs': [], 'numMarkedTabs': []};
+
+  log['popupOpened'] = {'time': [], 'numOpenTabs': []};
   log['visualizationOpened'] = {'time': [], 'numOpenTabs': []};
+  log['visualizationOpenedFromPopup'] = 0;
+  log['visualizationOpenedFromHotkey'] = 0;
+
+  log['switchToMarkedTabFromPopup'] = 0;
+  log['switchToMarkedTabFromHotkey'] = 0;
+
+  log['openRecentFromPopup'] = 0;
+  log['openFrequentFromPopup'] = 0;
+
+  log['switchToTabFromVisualization'] = 0;
+  log['switchToTabFromPanelTree'] = 0;
+
+  log['markTabFromHotkey'] = 0;
+  log['markTabFromPopup'] = 0;
+  log['markTabFromVisualization'] = 0;
+  log['markTabFromPanelTree'] = 0;
+
+  log['helpOpenedFromPopup'] = 0;
+
+  logInitialized = true;
 }
 
 initLog();
@@ -32,6 +55,8 @@ initLog();
  * Track the number of open tabs in the current window over time
  */
 function logTabsOpen() {
+  if (!doLog) return;
+
   chrome.tabs.query({currentWindow: true}, function(tabs) {
     var windowId = tabs[0].windowId;
     if (!(windowId in log['tabsOpen'])) {
@@ -45,20 +70,88 @@ function logTabsOpen() {
 }
 
 function logTabCreated() {
+  if (!doLog) return;
+
   log['tabsCreated']++;
   logTabsOpen();
 }
 
 function logTabClosed() {
+  if (!doLog) return;
+
   log['tabsClosed']++;
   logTabsOpen();
 }
 
 function logTabMoved() {
+  if (!doLog) return;
+
   log['tabsMoved']++;
 }
 
+function logSwitchToMarkedTabFromPopup() {
+  if (!doLog) return;
+
+  log['switchToMarkedTabFromPopup']++;
+}
+
+function logSwitchToMarkedTabFromHotkey() {
+  if (!doLog) return;
+
+  log['switchToMarkedTabFromHotkey']++;
+}
+
+function logOpenRecentFromPopup() {
+  if (!doLog) return;
+
+  log['openRecentFromPopup']++;
+}
+
+function logOpenFrequentFromPopup() {
+  if (!doLog) return;
+
+  log['openFrequentFromPopup']++;
+}
+
+function logSwitchToTabFromVisualization() {
+  if (!doLog) return;
+
+  log['switchToTabFromVisualization']++;
+}
+
+function logSwitchToTabFromPanelTree() {
+  if (!doLog) return;
+
+  log['switchToTabFromPanelTree']++;
+}
+
+function logMarkTabFromPanelTree() {
+  if (!doLog) return;
+  
+  log['markTabFromPanelTree']++;
+}
+
+function logMarkTabFromHotkey() {
+  if (!doLog) return;
+  
+  log['markTabFromHotkey']++;
+}
+
+function logMarkTabFromPopup() {
+  if (!doLog) return;
+  
+  log['markTabFromPopup']++;
+}
+
+function logMarkTabFromVisualization() {
+  if (!doLog) return;
+  
+  log['markTabFromVisualization']++;
+}
+
 function logTabsActivated(activeInfo) {
+  if (!doLog) return;
+
   log['tabsActivated']['id'].push(activeInfo.tabId);
   log['tabsActivated']['time'].push(Date.now());
   chrome.tabs.get(activeInfo.tabId, function(tab) {
@@ -66,11 +159,29 @@ function logTabsActivated(activeInfo) {
   });
 }
 
+function logPopupOpened() {
+  if (!doLog) return;
+
+  log['popupOpened']['time'].push(Date.now());
+  chrome.tabs.query({currentWindow: true}, function(tabs) {
+    var numOpenTabs = tabs.length;
+    log['popupOpened']['numOpenTabs'].push(numOpenTabs);
+  });
+}
+
+function logHelpOpenedFromPopup() {
+  if (!doLog) return;
+
+  log['helpOpenedFromPopup']++;
+}
+
 /* 
  * Log the time and the number of open tabs when the visualization is
  * opened
  */
 function logVisualizationOpened() {
+  if (!doLog) return;
+
   log['visualizationOpened']['time'].push(Date.now());
   chrome.tabs.query({currentWindow: true}, function(tabs) {
     var numOpenTabs = tabs.length;
@@ -78,10 +189,25 @@ function logVisualizationOpened() {
   });
 }
 
+function logVisualizationOpenedFromPopup() {
+  if (!doLog) return; 
+
+  log['visualizationOpenedFromPopup']++;
+}
+
+function logVisualizationOpenedFromHotkey() {
+  if (!doLog) return; 
+
+  log['visualizationOpenedFromHotkey']++;
+}
+
+
 /*
  * Log the time, number of open tabs and number of marked tabs
  */
 function logTabsMarked() {
+  if (!doLog) return;
+
   log['tabsMarked']['time'].push(Date.now());
   log['tabsMarked']['numMarkedTabs'].push(tabsMarked.length);
   chrome.tabs.query({currentWindow: true}, function(tabs) {
@@ -127,11 +253,15 @@ chrome.commands.onCommand.addListener(function(command) {
       if (tabs.length == 0) {
         if (doLog)
           logVisualizationOpened();
-        chrome.tabs.create({url: "visualization/hypertree.html"});
+        chrome.tabs.create({url: "visualization/hypertree.html"}, function() {
+          logVisualizationOpenedFromHotkey();
+        });
       }
       else {
         // If a visualization tab is already open, switch to it
-        chrome.tabs.update(tabs[0].id, {active: true});
+        chrome.tabs.update(tabs[0].id, {active: true}, function() {
+          logVisualizationOpenedFromHotkey();
+        });
       }
     });
   }
@@ -143,7 +273,9 @@ chrome.commands.onCommand.addListener(function(command) {
         unmarkTab(tabId);
       }
       else {
-        markTab(tabId);
+        markTab(tabId, function() {
+          logMarkTabFromHotkey();
+        });
       }
     });
   }
@@ -177,7 +309,9 @@ chrome.commands.onCommand.addListener(function(command) {
         
         // switch to the next tab
         console.log('switch to ' + next);
-        chrome.tabs.update(tabs[next].id, {active: true});
+        chrome.tabs.update(tabs[next].id, {active: true}, function() {
+          logSwitchToMarkedTabFromHotkey();
+        });
       });
       
     });
@@ -190,35 +324,35 @@ chrome.commands.onCommand.addListener(function(command) {
  * hypertree.js.
  */
 chrome.tabs.onCreated.addListener(function(tab) { 
-    tabOpenerInfo[tab.id] = tab.openerTabId;
+  tabOpenerInfo[tab.id] = tab.openerTabId;
 });
 
 /*
  * listener for preview of activated tab  
-*/
+ */
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    if (tab.active == true && changeInfo.status == "complete"){
-        chrome.tabs.captureVisibleTab(function (imgDataURL) {
-            localStorage.setItem(tabId.toString(), imgDataURL);
-        });
-    }
+  if (tab.active == true && changeInfo.status == "complete"){
+    chrome.tabs.captureVisibleTab(function (imgDataURL) {
+      localStorage.setItem(tabId.toString(), imgDataURL);
+    });
+  }
 });
 
 
 /*
  * remove image data from localStorage when tab is closed 
-*/
+ */
 chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
-    localStorage.removeItem(tabId.toString());
+  localStorage.removeItem(tabId.toString());
 });
 
 /* 
  * clear localStorage when window is closed, however it doesn't work
  */
 chrome.windows.onRemoved.addListener(function (windowId) {
-    chrome.windows.remove(windowId, function () {
-        localStorage.clear();
-    });
+  chrome.windows.remove(windowId, function () {
+    localStorage.clear();
+  });
 });
 
 
