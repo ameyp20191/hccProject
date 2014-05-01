@@ -94,7 +94,7 @@ function init(groupBy){
     duration: 1000,
     Navigation: {
       enable: true,
-      panning: false,
+      panning: true,
       zooming: false
     },
 

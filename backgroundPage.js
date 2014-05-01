@@ -21,7 +21,8 @@ function initLog() {
   log['tabsCreated'] = 0;       // Total number of tabs created
   log['tabsMoved'] = 0;
   log['tabsClosed'] = 0;
-  log['tabsActivated'] = {'id': [], 'index': [], 'time': []};    // Time, position and ID of active tab
+  // Time, position and ID of active tab, number of open tabs at each time point
+  log['tabsActivated'] = {'id': [], 'index': [], 'time': [], 'numOpenTabs': []};
 
   log['tabsMarked'] = {'time': [], 'numOpenTabs': [], 'numMarkedTabs': []};
 
@@ -156,6 +157,9 @@ function logTabsActivated(activeInfo) {
   log['tabsActivated']['time'].push(Date.now());
   chrome.tabs.get(activeInfo.tabId, function(tab) {
     log['tabsActivated']['index'].push(tab.index);
+  });
+  chrome.tabs.query({currentWindow: true}, function(tabs) {
+    log['tabsActivated']['numOpenTabs'].push(tabs.length);
   });
 }
 
