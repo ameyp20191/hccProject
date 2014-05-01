@@ -504,6 +504,7 @@ function setupTree(groupBy) {
 
 function setGroupBy(groupBy) {
   chrome.extension.getBackgroundPage().groupBy = groupBy;
+  chrome.extension.getBackgroundPage().logGroupBy(groupBy);
 }
 
 function getGroupBy() {

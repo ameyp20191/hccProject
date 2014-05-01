@@ -18,11 +18,11 @@ function initLog() {
   log['endTime'] = 0;
 
   log['tabsOpen'] = {};
-  log['tabsCreated'] = 0;       // Total number of tabs created
-  log['tabsMoved'] = 0;
-  log['tabsClosed'] = 0;
+  log['tabsCreated'] = {'time': [], 'window': [], 'index': [], 'numOpenTabs': []};
+  log['tabsMoved'] = {'time': [], 'window': [], 'numOpenTabs': []};
+  log['tabsClosed'] = {'time': [], 'window': [], 'numOpenTabs': []};
   // Time, position and ID of active tab, number of open tabs at each time point
-  log['tabsActivated'] = {'id': [], 'index': [], 'time': [], 'numOpenTabs': []};
+  log['tabsActivated'] = {'time': [], 'id': [], 'window': [], 'index': [], 'numOpenTabs': []};
 
   log['tabsMarked'] = {'time': [], 'numOpenTabs': [], 'numMarkedTabs': []};
 
@@ -47,6 +47,11 @@ function initLog() {
 
   log['helpOpenedFromPopup'] = 0;
 
+  log['urlsVisited'] = 0;
+  log['urlsRevisited'] = 0;
+
+  log['groupBy'] = {'time': [], 'id': []};
+
   logInitialized = true;
 }
 
@@ -61,33 +66,50 @@ function logTabsOpen() {
   chrome.tabs.query({currentWindow: true}, function(tabs) {
     var windowId = tabs[0].windowId;
     if (!(windowId in log['tabsOpen'])) {
-      log['tabsOpen'][windowId] = {'time': [], 'num': []};
+      log['tabsOpen'][windowId] = {'time': [], 'numOpenTabs': []};
     }
 
     // Log the timestamp and number of tabs open for each window
     log['tabsOpen'][windowId]['time'].push(Date.now());
-    log['tabsOpen'][windowId]['num'].push(tabs.length);
+    log['tabsOpen'][windowId]['numOpenTabs'].push(tabs.length);
   });
 }
 
-function logTabCreated() {
+function logTabCreated(tab) {
   if (!doLog) return;
 
-  log['tabsCreated']++;
+  log['tabsCreated']['time'].push(Date.now());
+  log['tabsCreated']['index'].push(tab.index);
+  log['tabsCreated']['window'].push(tab.windowId);
+
+  chrome.tabs.query({currentWindow: true}, function(tabs) {
+    log['tabsCreated']['numOpenTabs'].push(tabs.length);
+  });
+
   logTabsOpen();
 }
 
-function logTabClosed() {
+function logTabClosed(tabId, removeInfo) {
   if (!doLog) return;
 
-  log['tabsClosed']++;
+  log['tabsClosed']['time'].push(Date.now());
+  log['tabsClosed']['window'].push(removeInfo.windowId);
+
+  chrome.tabs.query({currentWindow: true}, function(tabs) {
+    log['tabsClosed']['numOpenTabs'].push(tabs.length);
+  });
+
   logTabsOpen();
 }
 
-function logTabMoved() {
+function logTabMoved(tabId, moveInfo) {
   if (!doLog) return;
 
-  log['tabsMoved']++;
+  log['tabsMoved']['time'].push(Date.now());
+  log['tabsMoved']['window'].push(moveInfo.windowId);
+  chrome.tabs.query({currentWindow: true}, function(tabs) {
+    log['tabsMoved']['numOpenTabs'].push(tabs.length);
+  });
 }
 
 function logSwitchToMarkedTabFromPopup() {
@@ -154,6 +176,7 @@ function logTabsActivated(activeInfo) {
   if (!doLog) return;
 
   log['tabsActivated']['id'].push(activeInfo.tabId);
+  log['tabsActivated']['window'].push(activeInfo.windowId);
   log['tabsActivated']['time'].push(Date.now());
   chrome.tabs.get(activeInfo.tabId, function(tab) {
     log['tabsActivated']['index'].push(tab.index);
@@ -205,6 +228,19 @@ function logVisualizationOpenedFromHotkey() {
   log['visualizationOpenedFromHotkey']++;
 }
 
+function logUrlVisited(tabId, changeInfo, tab) {
+  if (!doLog) return;
+  if (!changeInfo.url) return;
+
+  log['urlsVisited']++;
+
+  // Not very accurate
+  chrome.history.getVisits({url: tab.url}, function(visits) {
+    if (visits.length > 1) {    // Excluding this visit
+      log['urlsRevisited']++;
+    }
+  });
+}
 
 /*
  * Log the time, number of open tabs and number of marked tabs
@@ -218,6 +254,17 @@ function logTabsMarked() {
     var numOpenTabs = tabs.length;
     log['tabsMarked']['numOpenTabs'].push(numOpenTabs);
   });
+}
+
+function logGroupBy(groupBy) {
+  var id = -1;
+
+  if (groupBy == "url") id = 0;
+  else if (groupBy == "category") id = 1;
+  else if (groupBy == "sequence") id = 2;
+
+  log['groupBy']['time'].push(Date.now());
+  log['groupBy']['id'].push(id);
 }
 
 function toggleLogging() {
@@ -236,6 +283,7 @@ function startLogging() {
   chrome.tabs.onRemoved.addListener(logTabClosed);
   chrome.tabs.onMoved.addListener(logTabMoved);
   chrome.tabs.onActivated.addListener(logTabsActivated);
+  chrome.tabs.onUpdated.addListener(logUrlVisited);
 }
 
 function stopLogging() {
@@ -245,6 +293,7 @@ function stopLogging() {
   chrome.tabs.onRemoved.removeListener(logTabClosed);
   chrome.tabs.onMoved.removeListener(logTabMoved);
   chrome.tabs.onActivated.removeListener(logTabsActivated);
+  chrome.tabs.onUpdated.removeListener(logUrlVisited);
 }
 
 
