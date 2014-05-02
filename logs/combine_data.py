@@ -74,8 +74,12 @@ def main():
                ('xi_off_on/off.json',
                 {name: 'XI', state: off, when: first, length: min_30})]
 
+    sk_logs = [('sk_off_on/on.json',
+                {name: 'SK', state: on, when: second, length: min_30}),
+               ('sk_off_on/off.json',
+                {name: 'SK', state: off, when: first, length: min_30})]
 
-    all_logs_mixed = [sr_logs, zy_logs, wk_logs, xi_logs]
+    all_logs_mixed = [sr_logs, zy_logs, wk_logs, xi_logs, sk_logs]
 
     # Make proper log_info list
     all_logs = []
