@@ -54,17 +54,28 @@ def main():
     min_30 = 30
 
     # Add log info here
-    sr_logs = [('sw_on_off/1_on.json',
+    sr_logs = [('sw_on_off/on.json',
                 {name: 'SR', state: on, when: first, length: min_30}),
-               ('sw_on_off/2_off.json',
+               ('sw_on_off/off.json',
                 {name: 'SR', state: off, when: second, length: min_30})]
 
-    zy_logs = [('zy_on_off/study_on.json',
+    zy_logs = [('zy_on_off/on.json',
                 {name: 'ZY', state: on, when: first, length: min_30}),
-               ('zy_on_off/study_off.json',
+               ('zy_on_off/off.json',
                 {name: 'ZY', state: off, when: second, length: min_30})]
 
-    all_logs_mixed = [sr_logs, zy_logs]
+    wk_logs = [('wk_on_off/on.json',
+                {name: 'WK', state: on, when: first, length: min_30}),
+               ('wk_on_off/off.json',
+                {name: 'WK', state: off, when: second, length: min_30})]
+
+    xi_logs = [('xi_off_on/on.json',
+                {name: 'XI', state: on, when: second, length: min_30}),
+               ('xi_off_on/off.json',
+                {name: 'XI', state: off, when: first, length: min_30})]
+
+
+    all_logs_mixed = [sr_logs, zy_logs, wk_logs, xi_logs]
 
     # Make proper log_info list
     all_logs = []
@@ -75,7 +86,7 @@ def main():
             all_logs.append(log_info)
 
     combined = combine_logs(all_logs)
-    out = '/tmp/combined.json'
+    out = './combined.json'
     with open(out, 'w') as f:
         json.dump(combined, f)
     print "Combined logs saved to %s." % (out)
