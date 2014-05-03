@@ -19,7 +19,30 @@ def transform_log(fname, extra):
     """
     with open(fname, 'r') as f:
         data = json.load(f)
+        # Remove window id from tabsOpen
+        window_id = data['tabsOpen'].keys()[0]
+        data['tabsOpen'] = data['tabsOpen'][window_id]
+        if 'num' in data['tabsOpen']:
+            data['tabsOpen']['numOpenTabs'] = data['tabsOpen']['num']
+            del data['tabsOpen']['num']
         data.update(extra)
+
+    return data
+
+
+def transform_log_for_excel(fname, extra):
+    data = transform_log(fname, extra)
+    items = data.items()
+    for key, value in items:
+        if isinstance(value, dict):
+            for k in value.keys():
+                newkey = key + k.capitalize()
+                data[newkey] = value[k]
+        del data[key]
+
+    for key, value in data.items():
+        if isinstance(value, list):
+            data[key] = [','.join(map(str, value))]
 
     return data
 
