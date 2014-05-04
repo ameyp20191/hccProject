@@ -332,45 +332,55 @@ chrome.commands.onCommand.addListener(function(command) {
       }
     });
   }
-  else if (command === "switch-mark-tab") {
-    //alert('hotkey');
-    chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
-      var currentTabId = tabs[0].id;
-      
-      chrome.tabs.getAllInWindow(null, function(tabs) {      
-        var index = -1;
-        
-        for (var i = 0; i < tabs.length; ++i) {
-          if (tabs[i].id == currentTabId) {
-            index = i;
-            break;
-          }
-        }
-        if (index == -1)
-          return;
-        
-        var next = (index + 1) % tabs.length;
-        
-        // find the next marked tab
-        if (tabsMarked.length > 0) {
-          while (next != index) {
-            if (tabsMarked.indexOf(tabs[next].id) >= 0)
-              break;
-            next = (next + 1) % tabs.length;
-          }
-        }
-        
-        // switch to the next tab
-        console.log('switch to ' + next);
-        chrome.tabs.update(tabs[next].id, {active: true}, function() {
-          logSwitchToMarkedTabFromHotkey();
-        });
-      });
-      
-    });
+  else if (command === "switch-mark-tab") {    
+    switchTabs(1);
+  }
+  else if (command === "switch-mark-tab-reverse") {
+    switchTabs(-1);
   }
 });
 
+/**
+ * Switch between marked tabs
+ * @param {Int} direction - 1: switch to the left, -1: switch to the right
+ */
+function switchTabs(direction)
+{
+  chrome.tabs.query({currentWindow: true, active: true}, function(tabs) {
+    var currentTabId = tabs[0].id;
+    
+    chrome.tabs.getAllInWindow(null, function(tabs) {      
+      var index = -1;
+      
+      for (var i = 0; i < tabs.length; ++i) {
+        if (tabs[i].id == currentTabId) {
+          index = i;
+          break;
+        }
+      }
+      if (index == -1)
+        return;
+      
+      var next = (index + direction + tabs.length) % tabs.length;
+      
+      // find the next marked tab
+      if (tabsMarked.length > 0) {
+        while (next != index) {
+          if (tabsMarked.indexOf(tabs[next].id) >= 0)
+            break;
+          next = (next + direction + tabs.length) % tabs.length;
+        }
+      }
+      
+      // switch to the next tab
+      console.log('switch to ' + next);
+      chrome.tabs.update(tabs[next].id, {active: true}, function() {
+        logSwitchToMarkedTabFromHotkey();
+      });
+    });
+    
+  });
+}
 /**
  * Store ID of a created tab's parent. Strangely, the native
  * tab.openerTabId property is always undefined when accessed by
