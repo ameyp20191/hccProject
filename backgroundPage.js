@@ -302,7 +302,7 @@ function stopLogging() {
  */
 chrome.commands.onCommand.addListener(function(command) {
   if (command === "launch-visualization") {
-    chrome.tabs.query({title: "Visualize tabs"}, function(tabs) {
+    chrome.tabs.query({title: "Explore tabs"}, function(tabs) {
       if (tabs.length == 0) {
         if (doLog)
           logVisualizationOpened();
