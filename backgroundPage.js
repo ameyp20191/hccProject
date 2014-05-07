@@ -338,7 +338,7 @@ chrome.commands.onCommand.addListener(function(command) {
   else if (command === "switch-mark-tab-reverse") {
     switchTabs(-1);
   }
-});
+})
 
 /**
  * Switch between marked tabs
