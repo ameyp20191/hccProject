@@ -26,7 +26,7 @@ function showMarkAction(node) {
       markLink.hide();
     }
 
-  });
+  })
 }
 
 /**
